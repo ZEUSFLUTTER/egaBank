@@ -87,6 +87,33 @@ public class CompteServiceImpl implements CompteService {
     }
 
     @Override
+    public boolean activeCompte(String numCompte) {
+        Optional<CompteBancaire> compte =this.compteBancaireRepository.findByNumCompte(numCompte);
+        if(compte.isPresent() && compte.get().getStatus().equals(AccountStatus.SUSPENDED)){
+            CompteBancaire c =  compte.get();
+            c.setStatus(AccountStatus.ACTIVATED);
+            this.compteBancaireRepository.save(c);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public boolean suspendCompte(String numCompte) {
+        Optional<CompteBancaire> compte =this.compteBancaireRepository.findByNumCompte(numCompte);
+        if(compte.isPresent() && compte.get().getStatus().equals(AccountStatus.ACTIVATED)){
+            CompteBancaire c =  compte.get();
+            c.setStatus(AccountStatus.SUSPENDED);
+            this.compteBancaireRepository.save(c);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+    @Override
     public CompteBancaire findOne(String numCompte) {
         return this.compteBancaireRepository.findByNumCompte(numCompte).orElse(null);
     }
