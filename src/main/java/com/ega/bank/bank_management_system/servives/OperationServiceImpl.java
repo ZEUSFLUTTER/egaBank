@@ -1,6 +1,8 @@
 package com.ega.bank.bank_management_system.servives;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -98,6 +100,17 @@ public class OperationServiceImpl implements OperationService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Operation> findByClientNumCompte(String numCompte){
+        List<Operation> list =  new ArrayList<>();
+        for (Operation o:this.operationRepository.findAll()){
+            if(o.getCompte().getNumCompte().equals(numCompte)){
+                list.add(o);
+            }
+        }
+        return list;
     }
 
     private static String generateAccountNumber() {
