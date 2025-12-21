@@ -19,12 +19,14 @@ public class OperationRestController {
 
     @PostMapping("/operations/versement")
     public Object effectuerVersement(@RequestBody OperationDto dto){
-        return this.operationService.effectuerVersement(dto);
+        this.operationService.effectuerVersement(dto);
+        return true;
     }
 
     @PostMapping("/operations/retrait")
     public Object effectuerRetrait(@RequestBody OperationDto dto){
-        return this.operationService.effectuerRetrait(dto);
+        this.operationService.effectuerRetrait(dto);
+        return true;
     }
 
     @PostMapping("/operations/virement")
