@@ -35,7 +35,7 @@ public abstract  class CompteBancaire implements Serializable{
     @Column(nullable=false)
     private String numCompte;
     @Column(nullable=false)
-    private String balance;
+    private double balance;
     @Column(nullable=false)
     private String devis = "CFA";
     private AccountStatus status;
