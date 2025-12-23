@@ -1,9 +1,12 @@
 import { Compte } from "./comptes";
 
 export interface Operation{
-  compte : Compte;
   id : number;
-  numOperation : String;
+  Compte : Compte;
+  amount : number;
   dateOperation : Date;
-  typeOperation : String
+  numOperation : String;
+  numCompteSource : string;
+  numCompteDestination :string;
+  typeOperation : String;
 }

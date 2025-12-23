@@ -1,7 +1,15 @@
 package com.ega.bank.bank_management_system.web;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ega.bank.bank_management_system.dto.OperationDto;
 import com.ega.bank.bank_management_system.entities.Operation;
 import com.ega.bank.bank_management_system.servives.OperationService;
@@ -31,7 +39,8 @@ public class OperationRestController {
 
     @PostMapping("/operations/virement")
     public boolean virement(@RequestBody OperationDto dto){
-        return this.operationService.effectuerVirement(dto);
+        this.operationService.effectuerVirement(dto);
+        return true;
     }
 
     @GetMapping("/operations/client/{numCompte}")
