@@ -1,0 +1,32 @@
+<section class="-mt24 bg-bleuGray-200">
+  <div class="container px-4 mx-auto">
+    <div class="flex flex-wrap">
+      <div class="w-full px-4 pt-6 text-center lg:pt-12 md:w-4/112">
+        <div class="relative flex flex-col w-full min-w-0 mb-1 break-words bg-white">
+          <div class="flex-auto px-4">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center mt-16">
+      <div class="w-full px-4 ml-auto mr-auto md:w-5/12">
+        <app-info *ngIf="!isAdd && !isList"></app-info>
+        <app-left
+          [isAdding]="isAdd"
+          [isList]="isList">
+        </app-left>
+      </div>
+      <div class="w-full px-4 ml-auto mr-auto md:w-4/12">
+        <div class="relative flex flex-col w-full min-w-0 mb-2 break-words bg-blue-50">
+          <app-right
+          (onAdded)="addClient($event)"
+          (onListed)="showClient($event)"
+          >
+
+          </app-right>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
