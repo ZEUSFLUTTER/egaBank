@@ -44,8 +44,9 @@ export class FormClient implements OnInit {
   }
 
   onSubmit() {
+    if (this.submitted || this.customerForm.invalid) return;
+
     this.submitted = true;
-    if (this.customerForm.invalid) return;
 
     const newClient = {
       nom: this.customerForm.value.firstName,
@@ -59,15 +60,33 @@ export class FormClient implements OnInit {
     };
 
     this.clientService.postClients(newClient as Client).subscribe({
-      next: () => {
-        this.clientService.getClients().subscribe(clients => {
-          const lastClient = clients[clients.length - 1];
-          this.idClient = lastClient.id!;
-          this.showCompteForm = true;
-          this.isSuccessed = true;
-          this.cdr.detectChanges();
-        });
+      next: (response: any) => {
+        if (response && response.id) {
+          this.idClient = response.id;
+          this.name = response.nom + " " + response.prenom;
+          this.finishRegistration();
+        }
+
+        else {
+          this.clientService.getClients().subscribe(clients => {
+            const lastClient = clients[clients.length - 1];
+            this.idClient = lastClient.id!;
+            this.name = lastClient.nom + " " + lastClient.prenom;
+            this.finishRegistration();
+          });
+        }
+      },
+      error: (err) => {
+        this.submitted = false;
+        console.error("Erreur d'enregistrement", err);
       }
     });
+  }
+
+  // Petite fonction helper pour nettoyer la logique
+  private finishRegistration() {
+    this.isSuccessed = true;
+    this.showCompteForm = true;
+    this.cdr.detectChanges();
   }
 }

@@ -113,13 +113,21 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-      <button type="submit" [disabled]="customerForm.invalid"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-blue-500/20 transform hover:-translate-y-1">
+      <button type="submit"
+        [disabled]="customerForm.invalid || submitted"
+        class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-blue-500/20 transform hover:-translate-y-1 flex items-center justify-center gap-3">
+
+        @if (submitted && !isSuccessed) {
+        <span
+          class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        Traitement...
+        } @else {
         Enregistrer le client
+        }
       </button>
       <button type="reset"
         class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold py-4 rounded-2xl transition-all border border-slate-700 transform hover:-translate-y-1">
-        Annuler / Réinitialiser
+        Annuler
       </button>
     </div>
   </form>
