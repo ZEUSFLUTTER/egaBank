@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
 import { Footer } from "../../../shared/modules/footer/footer";
 import { Left } from "./left/left";
 import { Header } from "../../../shared/modules/header/header";
@@ -7,7 +8,15 @@ import { Info } from "./info/info";
 
 @Component({
   selector: 'app-main',
-  imports: [Footer, Left, Header, Right, Info],
+  standalone: true,
+  imports: [
+    CommonModule,
+    Footer,
+    Left,
+    Header,
+    Right,
+    Info
+  ],
   templateUrl: './main.html',
   styleUrl: './main.scss',
 })

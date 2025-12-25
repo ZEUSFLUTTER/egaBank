@@ -12,6 +12,6 @@ public class CompteDto {
     private double balance;
     private double tauxInteret;
     private double decouvert;
-    private long ClientId;
+    private long clientId;
     
 }

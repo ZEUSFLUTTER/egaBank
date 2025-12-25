@@ -8,13 +8,11 @@ import com.ega.bank.bank_management_system.entities.CompteCourant;
 import com.ega.bank.bank_management_system.entities.CompteEpargne;
 
 public interface CompteService {
-    void createAccount(CompteDto compteDto);
+    CompteBancaire createAccount(CompteDto compteDto); 
 
     List<CompteEpargne> findCompteEpargnes();
     List<CompteCourant> findCompteCourants();
-
     CompteBancaire findOne(String numCompte);
-
     boolean activeCompte(String numCompte);
     boolean suspendCompte(String numCompte);
 }

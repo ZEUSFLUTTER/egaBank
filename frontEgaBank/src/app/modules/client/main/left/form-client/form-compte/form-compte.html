@@ -1,1 +1,79 @@
-<p>form-compte works!</p>
+<div class="mt-8 pt-8 border-t border-slate-800">
+
+  @if (isSuccessed) {
+    <div class="flex flex-col items-center justify-center p-8 bg-emerald-500/10 border border-emerald-500/50 rounded-3xl text-center space-y-4">
+      <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-white text-3xl shadow-lg shadow-emerald-500/40">
+        ✓
+      </div>
+      <div>
+        <h3 class="text-emerald-400 text-xl font-bold">Ouverture réussie !</h3>
+        <p class="text-slate-400">Le compte de <strong>{{ clientName }}</strong> a été créé.</p>
+      </div>
+      <button (click)="resetAll()" class="px-6 py-2 bg-slate-800 text-emerald-500 rounded-xl hover:bg-slate-700 transition-colors text-sm font-medium">
+        Créer un autre compte
+      </button>
+    </div>
+  } @else {
+    <form [formGroup]="compteForm" (ngSubmit)="onsubmit()" class="space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-400 text-xs font-bold uppercase tracking-wider">ID Client (Système)</label>
+          <input type="text" formControlName="clientId" readonly
+            class="bg-slate-800/30 border border-slate-700/50 text-emerald-500 font-mono rounded-xl p-3.5 outline-none cursor-not-allowed">
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-400 text-xs font-bold uppercase tracking-wider">Titulaire du compte</label>
+          <input type="text" formControlName="name" readonly
+            class="bg-slate-800/50 border border-slate-700 text-slate-400 rounded-xl p-3.5 outline-none cursor-not-allowed">
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-400 text-xs font-bold uppercase tracking-wider">Type de compte</label>
+          <select formControlName="type"
+            class="bg-slate-900 border border-slate-700 text-white rounded-xl p-3.5 outline-none focus:border-emerald-500 transition-colors">
+            <option value="" disabled>Choisir le type...</option>
+            <option value="COURANT">Compte Courant</option>
+            <option value="EPARGNE">Compte Épargne</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-400 text-xs font-bold uppercase tracking-wider">Solde Initial (F CFA / €)</label>
+          <input type="number" formControlName="balance" placeholder="Ex: 50000"
+            class="bg-slate-900 border border-slate-700 text-white rounded-xl p-3.5 outline-none focus:border-emerald-500 transition-colors">
+        </div>
+
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <label class="text-slate-400 text-xs font-bold uppercase tracking-wider">
+            @if (isEpargne) { Taux d'Intérêt (%) } @else { Découvert Autorisé }
+          </label>
+          <div class="relative">
+            <input type="number" formControlName="dt" [placeholder]="isEpargne ? 'Ex: 3.5' : 'Ex: 100000'"
+              class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3.5 outline-none focus:border-emerald-500 transition-colors">
+            <span class="absolute right-4 top-3.5 text-slate-500 italic">
+              {{ isEpargne ? '%' : 'Montant' }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-4">
+        <button type="submit" [disabled]="compteForm.invalid"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
+          @if (submitted && !isSuccessed) {
+            <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          }
+          Finaliser la création du compte
+        </button>
+
+        @if (submitted && compteForm.invalid) {
+          <p class="text-red-400 text-xs text-center mt-2 italic">Veuillez remplir tous les champs obligatoires.</p>
+        }
+      </div>
+    </form>
+  }
+</div>

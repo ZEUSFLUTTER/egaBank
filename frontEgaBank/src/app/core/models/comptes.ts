@@ -5,6 +5,8 @@ export interface Compte {
   id: number;
   numCompte: string;
   balance: number;
+  decouvert : number;
+  tauxInteret : number;
   devis: string;
   status: any;
   createdAt: Date;

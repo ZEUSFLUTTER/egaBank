@@ -13,11 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
-    private final ClientRepository clientRepository;
-
+private final ClientRepository clientRepository;
 
     @Override
-    public void createNewClient(ClientDto clientDto) {
+    public Client createNewClient(ClientDto clientDto) {
         Client client = new Client();
         client.setNom(clientDto.getNom());
         client.setPrenom(clientDto.getPrenom());
@@ -28,7 +27,7 @@ public class ClientServiceImpl implements ClientService {
         client.setTelephone(clientDto.getTelephone());
         client.setSexe(clientDto.getSexe());
         
-        this.clientRepository.save(client);
+        return this.clientRepository.save(client);
     }
 
     @Override

@@ -4,32 +4,33 @@ import org.springframework.web.bind.annotation.*;
 import com.ega.bank.bank_management_system.dto.ClientDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.servives.ClientService;
-
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/api/v1")
+@RequestMapping(value = "/api/v1")
 @CrossOrigin("*")
 public class ClientRestController {
 
     private final ClientService clientService;
-    
-    public ClientRestController(final ClientService clientService){
+
+    public ClientRestController(final ClientService clientService) {
         this.clientService = clientService;
     }
 
     @PostMapping("/clients")
-    public void createClient(@RequestBody ClientDto dto){
-        this.clientService.createNewClient(dto);
+    public Client createClient(@RequestBody ClientDto dto) {
+        Client created = this.clientService.createNewClient(dto);
+        System.out.println("DEBUG - Client créé avec ID : " + created.getId()); // Vérifiez votre console Java
+        return created;
     }
 
     @GetMapping("/clients")
-    public List<Client> findAll(){
+    public List<Client> findAll() {
         return this.clientService.findAll();
     }
 
     @GetMapping("/clients/{id}")
-    public Client findOne(@PathVariable("id") long id){
+    public Client findOne(@PathVariable("id") long id) {
         return this.clientService.findOne(id);
     }
 }

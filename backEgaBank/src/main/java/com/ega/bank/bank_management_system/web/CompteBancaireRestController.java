@@ -11,7 +11,7 @@ import com.ega.bank.bank_management_system.entities.CompteEpargne;
 import com.ega.bank.bank_management_system.servives.CompteService;
 
 @RestController
-@RequestMapping(value="/api/v1")
+@RequestMapping(value = "/api/v1")
 @CrossOrigin("*")
 public class CompteBancaireRestController {
 
@@ -22,14 +22,15 @@ public class CompteBancaireRestController {
     }
 
     @PostMapping("/comptes")
-    public void createAccount(@RequestBody CompteDto compteDto) {
-        this.compteService.createAccount(compteDto);
+    public ResponseEntity<CompteBancaire> createAccount(@RequestBody CompteDto compteDto) {
+        CompteBancaire cb = this.compteService.createAccount(compteDto);
+        return ResponseEntity.ok(cb); 
     }
 
     @GetMapping("/comptes/type/{type}")
     public List<?> findAll(@PathVariable("type") String type) {
         if (type.equals("CC")) {
-            return this.compteService.findCompteCourants(); 
+            return this.compteService.findCompteCourants();
         }
         if (type.equals("CE")) {
             return this.compteService.findCompteEpargnes();
@@ -38,11 +39,11 @@ public class CompteBancaireRestController {
     }
 
     @GetMapping("/comptes/{numCompte}/{type}")
-    public ResponseEntity<?> findCompte(@PathVariable("numCompte") String numCompte, 
-                                        @PathVariable("type") String type) {
-        
+    public ResponseEntity<?> findCompte(@PathVariable("numCompte") String numCompte,
+            @PathVariable("type") String type) {
+
         CompteBancaire compteBancaire = this.compteService.findOne(numCompte);
-        
+
         if (compteBancaire == null) {
             return ResponseEntity.notFound().build();
         }
@@ -50,11 +51,11 @@ public class CompteBancaireRestController {
         if (type.equals("CC") && (compteBancaire instanceof CompteCourant)) {
             return ResponseEntity.ok(compteBancaire);
         }
-        
+
         if (type.equals("CE") && (compteBancaire instanceof CompteEpargne)) {
-            return ResponseEntity.ok(compteBancaire); 
+            return ResponseEntity.ok(compteBancaire);
         }
-        
+
         return ResponseEntity.badRequest().body("Type de compte non valide pour ce numéro");
     }
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Date; 
+import java.util.Date;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,39 +28,37 @@ public class CompteServiceImpl implements CompteService {
     public CompteServiceImpl(
             final CompteBancaireRepository compteBancaireRepository,
             final ClientRepository clientRepository
-    ) { 
+    ) {
         this.clientRepository = clientRepository;
         this.compteBancaireRepository = compteBancaireRepository;
     }
 
     @Override
-    public void createAccount(CompteDto compteDto) {
+    public CompteBancaire createAccount(CompteDto compteDto) {
         Optional<Client> clientOpt = this.clientRepository.findById(compteDto.getClientId());
 
-        if (clientOpt.isPresent() && compteDto.getDecouvert() > 0 && compteDto.getTauxInteret() == 0) {
-            CompteCourant compteCourant = new CompteCourant();
-            compteCourant.setCreatedAt(new Date());
-            compteCourant.setBalance(compteDto.getBalance());
-            compteCourant.setDecouvert(compteDto.getDecouvert());
-            compteCourant.setClient(clientOpt.get());
-            compteCourant.setDevis(compteDto.getDevis());
-            compteCourant.setStatus(AccountStatus.ACTIVATED);
-            compteCourant.setNumCompte(generateAccountNumber());
-
-            this.compteBancaireRepository.save(compteCourant);
+        if (clientOpt.isEmpty()) {
+            throw new RuntimeException("Client non trouvé");
         }
 
-        if (clientOpt.isPresent() && compteDto.getDecouvert() == 0 && compteDto.getTauxInteret() > 0) {
-            CompteEpargne compteEpargne = new CompteEpargne();
-            compteEpargne.setCreatedAt(new Date());
-            compteEpargne.setBalance(compteDto.getBalance());
-            compteEpargne.setTauxInteret(compteDto.getTauxInteret());
-            compteEpargne.setClient(clientOpt.get());
-            compteEpargne.setDevis(compteDto.getDevis());
-            compteEpargne.setStatus(AccountStatus.ACTIVATED);
-            compteEpargne.setNumCompte(generateAccountNumber());
-
-            this.compteBancaireRepository.save(compteEpargne);
+        if (compteDto.getDecouvert() > 0) {
+            CompteCourant cc = new CompteCourant();
+            cc.setCreatedAt(new Date());
+            cc.setBalance(compteDto.getBalance());
+            cc.setDecouvert(compteDto.getDecouvert());
+            cc.setClient(clientOpt.get());
+            cc.setStatus(AccountStatus.ACTIVATED);
+            cc.setNumCompte(generateAccountNumber());
+            return this.compteBancaireRepository.save(cc); 
+        } else {
+            CompteEpargne ce = new CompteEpargne();
+            ce.setCreatedAt(new Date());
+            ce.setBalance(compteDto.getBalance());
+            ce.setTauxInteret(compteDto.getTauxInteret());
+            ce.setClient(clientOpt.get());
+            ce.setStatus(AccountStatus.ACTIVATED);
+            ce.setNumCompte(generateAccountNumber());
+            return this.compteBancaireRepository.save(ce); 
         }
     }
 
@@ -88,30 +86,29 @@ public class CompteServiceImpl implements CompteService {
 
     @Override
     public boolean activeCompte(String numCompte) {
-        Optional<CompteBancaire> compte =this.compteBancaireRepository.findByNumCompte(numCompte);
-        if(compte.isPresent() && compte.get().getStatus().equals(AccountStatus.SUSPENDED)){
-            CompteBancaire c =  compte.get();
+        Optional<CompteBancaire> compte = this.compteBancaireRepository.findByNumCompte(numCompte);
+        if (compte.isPresent() && compte.get().getStatus().equals(AccountStatus.SUSPENDED)) {
+            CompteBancaire c = compte.get();
             c.setStatus(AccountStatus.ACTIVATED);
             this.compteBancaireRepository.save(c);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     @Override
     public boolean suspendCompte(String numCompte) {
-        Optional<CompteBancaire> compte =this.compteBancaireRepository.findByNumCompte(numCompte);
-        if(compte.isPresent() && compte.get().getStatus().equals(AccountStatus.ACTIVATED)){
-            CompteBancaire c =  compte.get();
+        Optional<CompteBancaire> compte = this.compteBancaireRepository.findByNumCompte(numCompte);
+        if (compte.isPresent() && compte.get().getStatus().equals(AccountStatus.ACTIVATED)) {
+            CompteBancaire c = compte.get();
             c.setStatus(AccountStatus.SUSPENDED);
             this.compteBancaireRepository.save(c);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-
 
     @Override
     public CompteBancaire findOne(String numCompte) {
