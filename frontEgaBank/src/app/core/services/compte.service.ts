@@ -28,10 +28,10 @@ export class CompteService {
   }
 
   onActivateCompte(numCompte : string) : Observable<boolean>{
-    return this.httpClient.put<boolean>(`${this.API_URL}/acitve/${numCompte}`,{})
+    return this.httpClient.put<boolean>(`${this.API_URL}/active/${numCompte}`,{})
   }
 
-  onSuspendedCompte(numCompte : string) : Observable<boolean>{
+  onSuspendreCompte(numCompte : string) : Observable<boolean>{
     return this.httpClient.put<boolean>(`${this.API_URL}/suspendre/${numCompte}`,{})
   }
 }
