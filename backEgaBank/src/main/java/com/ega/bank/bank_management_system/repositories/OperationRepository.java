@@ -10,5 +10,5 @@ import jakarta.transaction.Transactional;
 @Repository
 @Transactional
 public interface OperationRepository extends JpaRepository<Operation, Long> {
-
+    List<Operation> findByCompteNumCompte(String numCompte);
 }

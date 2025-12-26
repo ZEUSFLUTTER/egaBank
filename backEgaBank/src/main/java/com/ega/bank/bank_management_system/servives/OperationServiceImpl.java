@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ega.bank.bank_management_system.dto.OperationDto;
 import com.ega.bank.bank_management_system.entities.CompteBancaire;
 import com.ega.bank.bank_management_system.entities.Operation;
-import com.ega.bank.bank_management_system.enums.TypeOperation;
 import com.ega.bank.bank_management_system.enums.AccountStatus;
+import com.ega.bank.bank_management_system.enums.TypeOperation;
 import com.ega.bank.bank_management_system.repositories.CompteBancaireRepository;
 import com.ega.bank.bank_management_system.repositories.OperationRepository;
 
@@ -103,14 +103,10 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public List<Operation> findByClientNumCompte(String numCompte){
-        List<Operation> list =  new ArrayList<>();
-        for (Operation o:this.operationRepository.findAll()){
-            if(o.getCompte().getNumCompte().equals(numCompte)){
-                list.add(o);
-            }
-        }
-        return list;
+    public List<Operation> findByClientNumCompte(String numCompte) {
+        return this.operationRepository.findAll().stream()
+                .filter(o -> o.getCompte().getNumCompte().equals(numCompte))
+                .toList();
     }
 
     private static String generateAccountNumber() {

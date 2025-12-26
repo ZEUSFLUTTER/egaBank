@@ -36,6 +36,8 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
     "express": "^5.1.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

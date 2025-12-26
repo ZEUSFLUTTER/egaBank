@@ -14,7 +14,7 @@ import { error } from 'console';
   templateUrl: './versement.html',
   styleUrl: './versement.scss',
 })
-export class Versement implements OnInit {
+export class Versement  implements OnInit {
   public opForm!: FormGroup;
   public submitted = false;
   compte!: Compte;

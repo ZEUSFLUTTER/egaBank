@@ -5,7 +5,7 @@ import { ClientRoutingModule } from "../../client/client-routing-module";
 
 @Component({
   selector: 'app-main',
-  imports: [Right, Left, ClientRoutingModule],
+  imports: [ClientRoutingModule],
   templateUrl: './main.html',
   styleUrl: './main.scss',
 })

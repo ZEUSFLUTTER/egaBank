@@ -8,7 +8,7 @@ import { Operation as OperationModel } from '../models/operation';
   providedIn: 'root',
 })
 export class Operation {
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
   private readonly API_URL = `${environment.apiUrl}/${environment.prefix}/operations`;
 
@@ -22,5 +22,9 @@ export class Operation {
 
   effectuerVirement(operation: OperationModel): Observable<boolean> {
     return this.httpClient.post<boolean>(`${this.API_URL}/virement`, operation);
+  }
+
+  getOperationsByCompte(numCompte: string): Observable<OperationModel[]> {
+    return this.httpClient.get<OperationModel[]>(`${this.API_URL}/client/${numCompte}`);
   }
 }
