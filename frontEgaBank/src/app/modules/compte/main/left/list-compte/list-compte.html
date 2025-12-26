@@ -14,8 +14,9 @@
         <label class="block text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">Filtrer par type</label>
         <select [value]="type" (change)="onSelectTypeCompte($event)"
           class="bg-slate-950/50 border border-slate-800 text-slate-300 text-sm rounded-xl block w-64 p-3 appearance-none cursor-pointer focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all">
-          <option value="CC">Compte Courant</option>
-          <option value="CE">Compte Épargne</option>
+          <option value="">Selectionné le compte</option>
+          <option value="CC">Compte Epargne</option>
+          <option value="CE">Compte Courant</option>
         </select>
       </div>
       <div class="text-right pt-6">
@@ -30,36 +31,43 @@
     <table class="w-full text-left border-separate border-spacing-y-0">
       <thead>
         <tr class="text-slate-500 text-[11px] uppercase tracking-[0.2em] bg-slate-950/20">
-          <th class="px-10 py-6 font-black border-b border-slate-800/50">Titulaire</th>
-          <th class="px-10 py-6 font-black border-b border-slate-800/50">N° Compte</th>
-          <th class="px-10 py-6 font-black border-b border-slate-800/50 text-right">Solde (FCFA)</th>
-          <th class="px-10 py-6 font-black border-b border-slate-800/50 text-center">Statut</th>
-          <th class="px-10 py-6 font-black border-b border-slate-800/50 text-center">Actions</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50">Titulaire</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">N° Compte</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-right">Solde (FCFA)</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Création</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Statut</th>
+          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Actions</th>
         </tr>
       </thead>
 
       <tbody class="divide-y divide-slate-800/30">
         <tr *ngFor="let c of comptes" class="hover:bg-blue-600/[0.03] transition-all group">
 
-          <td class="px-10 py-8">
+          <td class="px-8 py-6">
             <div class="flex items-center gap-4 text-white font-bold text-sm">
-              <div class="w-10 h-10 rounded-full border border-slate-700 overflow-hidden bg-slate-800">
+              <div class="w-10 h-10 rounded-full border border-slate-700 overflow-hidden bg-slate-800 flex-shrink-0 shadow-lg">
                 <img [src]="c?.client?.sexe === 'M' ? 'assets/profil.jpg' : 'assets/profile.jpg'"
                      class="w-full h-full object-cover">
               </div>
-              {{c?.client?.nom}} {{c?.client?.prenom}}
+              <span class="truncate">{{c?.client?.nom}} {{c?.client?.prenom}}</span>
             </div>
           </td>
 
-          <td class="px-10 py-8 text-slate-400 font-mono text-xs">
-            {{c.numCompte}}
+          <td class="px-8 py-6 text-center">
+            <span class="font-mono text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+              {{c.numCompte}}
+            </span>
           </td>
 
-          <td class="px-10 py-8 text-right font-black text-white text-lg">
+          <td class="px-8 py-6 text-right font-black text-white text-lg">
             {{c.balance | number:'1.0-0'}}
           </td>
 
-          <td class="px-10 py-8 text-center">
+          <td class="px-8 py-6 text-center text-slate-400 font-mono text-xs">
+            {{c.createdAt | date:'dd/MM/yyyy'}}
+          </td>
+
+          <td class="px-8 py-6 text-center">
             <span *ngIf="c.status === 'ACTIVATED'" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-tighter">
               ● Actif
             </span>
@@ -68,17 +76,17 @@
             </span>
           </td>
 
-          <td class="px-10 py-8 text-center">
+          <td class="px-8 py-6 text-center">
             <div class="flex justify-center gap-2">
               <button *ngIf="c.status === 'ACTIVATED'" (click)="onSuspendCompte(c.numCompte)"
-                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-rose-500 hover:text-white border border-slate-700 transition-all shadow-lg">
+                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-rose-500 hover:text-white border border-slate-700 transition-all shadow-md active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
               </button>
 
               <button *ngIf="c.status === 'SUSPENDED'" (click)="onActiveCompte(c.numCompte)"
-                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white border border-slate-700 transition-all shadow-lg">
+                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white border border-slate-700 transition-all shadow-md active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>

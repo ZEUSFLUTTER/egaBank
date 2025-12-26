@@ -14,8 +14,15 @@ import { CommonModule } from '@angular/common';
 })
 export class Main {
   public isList : boolean = false;
+  public isHistoric : boolean = false;
 
   showList ($event : boolean){
     this.isList = $event;
+    this.isHistoric=false;
+  }
+
+  showHistoric ($event : boolean){
+    this.isHistoric = $event;
+    this.isList= false;
   }
 }

@@ -10,9 +10,15 @@ import { CommonModule } from '@angular/common';
 })
 export class Right {
 
-@Output() isListed = new EventEmitter<boolean>();
+  @Output() isListed = new EventEmitter<boolean>();
+  @Output() isHistorique = new EventEmitter<boolean>();
 
-OnclickList() {
-  this.isListed.emit(true);
-}
+
+  OnclickList() {
+    this.isListed.emit(true);
+  }
+
+  OnclickHistorique() {
+    this.isHistorique.emit(true);
+  }
 }

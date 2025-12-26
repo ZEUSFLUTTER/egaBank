@@ -12,21 +12,23 @@ import { CompteService } from '../../../../../core/services/compte.service';
 })
 export class ListCompte implements OnInit {
   comptes: Compte[] = [];
-  type: string = 'CC';
+  type: string = '';
 
-  constructor(private compteService: CompteService) {}
+  constructor(private compteService: CompteService) { }
 
   ngOnInit(): void {
     this.onGetComptes(this.type);
   }
 
   onSelectTypeCompte($event: any): void {
-    this.type = $event.target.value;
-    if (this.type) {
-      this.onGetComptes(this.type);
-    } else {
+    const selectedValue = $event.target.value;
+    this.type = selectedValue;
+
+    if (!selectedValue || selectedValue === "") {
       this.comptes = [];
+      return;
     }
+    this.onGetComptes(selectedValue);
   }
 
   onGetComptes(type: string): void {
@@ -34,17 +36,17 @@ export class ListCompte implements OnInit {
       next: (data) => {
         this.comptes = data;
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error("Erreur de récupération:", err)
     });
   }
 
   onSuspendCompte(numCompte: string): void {
-    if (confirm('Voulez-vous vraiment suspendre ce compte ?')) {
+    if (confirm('Voulez-vous suspendre ce compte ?')) {
       this.compteService.onSuspendreCompte(numCompte).subscribe({
         next: () => {
           this.onGetComptes(this.type);
         },
-        error: (err) => console.error(err)
+        error: (err) => console.error("Erreur suspension:", err)
       });
     }
   }
@@ -54,7 +56,7 @@ export class ListCompte implements OnInit {
       next: () => {
         this.onGetComptes(this.type);
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error("Erreur activation:", err)
     });
   }
 }
