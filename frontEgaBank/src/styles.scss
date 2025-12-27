@@ -34,3 +34,13 @@ tr {
 tr:hover {
   transform: scale(1.01);
 }
+
+
+/* Dans styles.css */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}

@@ -1,6 +1,5 @@
 package com.ega.bank.bank_management_system.servives;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +22,15 @@ public class OperationServiceImpl implements OperationService {
 
     private final CompteBancaireRepository compteBancaireRepository;
     private final OperationRepository operationRepository;
+    private final EmailService emailService; 
 
-    public OperationServiceImpl(CompteBancaireRepository compteBancaireRepository, OperationRepository operationRepository) {
+
+    public OperationServiceImpl(CompteBancaireRepository compteBancaireRepository, 
+                                OperationRepository operationRepository, 
+                                EmailService emailService) {
         this.compteBancaireRepository = compteBancaireRepository;
         this.operationRepository = operationRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -48,6 +52,17 @@ public class OperationServiceImpl implements OperationService {
                 operation.setNumOperation(generateAccountNumber());
 
                 this.operationRepository.save(operation);
+
+
+                String emailClient = compte.getClient().getEmail();
+                if (emailClient != null) {
+                    emailService.envoyerNotification(
+                        emailClient, 
+                        "Avis de Crédit - EgaBank", 
+                        "Cher client, votre compte " + compte.getNumCompte() + " a été crédité de " + String.valueOf(dto.getAmount()) + " FCFA. Nouveau solde: " + compte.getBalance() + " FCFA."
+                    );
+                }
+
                 return compte;
             } else {
                 throw new RuntimeException("Dsl le compte est suspendu");
@@ -76,6 +91,16 @@ public class OperationServiceImpl implements OperationService {
                 operation.setNumOperation(generateAccountNumber());
 
                 this.operationRepository.save(operation);
+
+                String emailClient = compte.getClient().getEmail();
+                if (emailClient != null) {
+                    emailService.envoyerNotification(
+                        emailClient, 
+                        "Avis de Retrait - EgaBank", 
+                        "Cher client, un retrait de " + String.valueOf( dto.getAmount())+ " FCFA a été effectué sur votre compte " + compte.getNumCompte() + ". Nouveau solde: " + compte.getBalance() + " FCFA."
+                    );
+                }
+
                 return compte;
             } else {
                 throw new RuntimeException("Dsl le solde est insuffisant ou compte suspendu");
@@ -87,16 +112,21 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public boolean effectuerVirement(OperationDto dto) {
-
         String numCompteSource = dto.getNumCompteSource();
         OperationDto dtoSource = new OperationDto(numCompteSource, null, dto.getAmount());
-
         CompteBancaire compteBancaireSource = effectuerRetrait(dtoSource);
-
         if (compteBancaireSource != null) {
             String numCompteDestination = dto.getNumCompteDestination();
             OperationDto dtoDestination = new OperationDto(numCompteDestination, numCompteDestination, dto.getAmount());
             effectuerVersement(dtoDestination);
+
+            if(compteBancaireSource.getClient().getEmail() != null) {
+                emailService.envoyerNotification(
+                    compteBancaireSource.getClient().getEmail(),
+                    "Confirmation de Virement - EgaBank",
+                    "Votre virement de " + dto.getAmount() + " FCFA vers le compte " + numCompteDestination + " a été exécuté avec succès."
+                );
+            }
             return true;
         }
         return false;
@@ -112,16 +142,9 @@ public class OperationServiceImpl implements OperationService {
     private static String generateAccountNumber() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < 4; i++) {
-            sb.append("0");
-        }
-        for (int i = 0; i < 4; i++) {
-            sb.append(random.nextInt(2));
-        }
-        for (int i = 0; i < 10; i++) {
-            sb.append(random.nextInt(10));
-        }
+        for (int i = 0; i < 4; i++) sb.append("0");
+        for (int i = 0; i < 4; i++) sb.append(random.nextInt(2));
+        for (int i = 0; i < 10; i++) sb.append(random.nextInt(10));
         return sb.toString();
     }
 }

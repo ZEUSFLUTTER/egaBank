@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
 })
 export class Header {
   navs: any[] = [
-    { title: 'Acceuil', path: '/home' },
+    { title: 'Dashboard', path: '/home' },
     { title: 'Comptes', path: '/comptes' },
     { title: 'Clients', path: '/clients' },
     { title: 'Operations', path: '/operations' },

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.ega.bank.bank_management_system.entities.Operation;
 
 import jakarta.transaction.Transactional;
+import java.util.List;
 
 @Repository
 @Transactional
