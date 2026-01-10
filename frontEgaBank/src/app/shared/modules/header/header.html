@@ -1,20 +1,42 @@
-<nav class="sticky top-0 z-50 p-6 bg-[#020617] border-b border-slate-800">
-  <div class="container flex items-center justify-between mx-auto">
-    <div class="text-2xl font-bold text-white cursor-pointer" routerLink="/">
-      Ega<span class="text-blue-500">Bank</span>
-      <span
-        class="ml-2 text-xs font-light text-slate-500 hidden sm:inline uppercase tracking-widest">
-        Système de Gestion
-      </span>
-    </div>
+<nav class="sticky top-0 z-50 bg-white border-b-2 border-slate-200 shadow-sm">
+  <div class="container mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+          </svg>
+        </div>
+        <div class="cursor-pointer" routerLink="/">
+          <h1 class="text-2xl font-bold text-slate-900">
+            Ega<span class="text-primary-600">Bank</span>
+          </h1>
+          <p class="text-sm font-medium text-slate-600 uppercase tracking-wide hidden sm:block">
+            Système de Gestion
+          </p>
+        </div>
+      </div>
 
-    <ul class="flex space-x-8 text-sm font-medium text-slate-400">
-      <li *ngFor="let n of navs">
-        <a [routerLink]="n.path" routerLinkActive="text-blue-500"
-          class="hover:text-blue-300">
-          {{ n.title }}
-        </a>
-      </li>
-    </ul>
+      <!-- Navigation -->
+      <ul class="flex items-center space-x-8">
+        <li *ngFor="let n of navs">
+          <a [routerLink]="n.path" 
+             routerLinkActive="text-primary-600 font-bold bg-primary-50 px-3 py-2 rounded-lg"
+             class="text-slate-700 hover:text-primary-600 font-semibold px-3 py-2 rounded-lg transition-all duration-200 relative">
+            {{ n.title }}
+          </a>
+        </li>
+      </ul>
+
+      <!-- Actions -->
+      <div class="flex items-center space-x-4">
+        <button class="p-3 text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200 border border-transparent hover:border-primary-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5v-12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 </nav>

@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
 import { Operation } from '../../../../../core/models/operation';
 import { Operation as OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
-import { error } from 'console';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-versement',
@@ -14,7 +15,7 @@ import { error } from 'console';
   templateUrl: './versement.html',
   styleUrl: './versement.scss',
 })
-export class Versement  implements OnInit {
+export class Versement implements OnInit, OnDestroy {
   public opForm!: FormGroup;
   public submitted = false;
   compte!: Compte;
@@ -23,10 +24,13 @@ export class Versement  implements OnInit {
   isSuccessed: boolean = false;
   isError: string = '';
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private compteService: CompteService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -35,6 +39,10 @@ export class Versement  implements OnInit {
       numCompte: ['', [Validators.required]],
       type: ['']
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   get fb(): any {
@@ -48,6 +56,12 @@ export class Versement  implements OnInit {
       return;
     }
 
+    const operationData = {
+      numCompteSource: this.fb.numCompte.value,
+      amount: this.fb.montant.value,
+      type: 'VERSEMENT'
+    };
+
     this.operationService.effectuerVersement(<Operation>{
       numCompteSource: this.fb.numCompte.value,
       amount: this.fb.montant.value
@@ -57,6 +71,22 @@ export class Versement  implements OnInit {
         this.isSuccessed = true;
         this.opForm.reset();
         this.submitted = false;
+        this.showDetails = false;
+
+        // 🔄 NOTIFICATION EN TEMPS RÉEL
+        this.notificationService.notifyOperationSuccess('Versement', {
+          ...operationData,
+          compte: this.compte
+        });
+
+        // Forcer le rafraîchissement des composants liés
+        this.notificationService.forceRefresh('comptes');
+        this.notificationService.forceRefresh('operations');
+
+        // Réinitialiser après 3 secondes
+        setTimeout(() => {
+          this.isSuccessed = false;
+        }, 3000);
       },
       error: (err: any) => {
         this.isError = err.error?.message || "Erreur lors de l'opération";

@@ -1,93 +1,124 @@
-<div class="w-full bg-slate-900/40 backdrop-blur-md rounded-[2.5rem] border border-slate-800/50 shadow-2xl overflow-hidden transition-all duration-500">
+<div class="bg-white border-2 border-slate-200 rounded-xl lg:rounded-2xl shadow-lg overflow-hidden">
 
-  <div class="p-10 border-b border-slate-800/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-    <div>
-      <h5 class="text-3xl font-black text-white flex items-center gap-4">
-        <span class="w-2 h-10 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)]"></span>
-        Répertoire des Comptes
-      </h5>
-      <p class="text-slate-500 text-sm mt-2 font-medium">Gestion des actifs financiers EgaBank</p>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-6">
-      <div class="relative group">
-        <label class="block text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">Filtrer par type</label>
-        <select [value]="type" (change)="onSelectTypeCompte($event)"
-          class="bg-slate-950/50 border border-slate-800 text-slate-300 text-sm rounded-xl block w-64 p-3 appearance-none cursor-pointer focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all">
-          <option value="">Selectionné le compte</option>
-          <option value="CC">Compte Epargne</option>
-          <option value="CE">Compte Courant</option>
-        </select>
+  <!-- Header responsive -->
+  <div class="p-4 sm:p-6 lg:p-8 border-b-2 border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0 gap-4 lg:gap-6">
+      <div>
+        <div class="flex items-center gap-3 lg:gap-4 mb-2">
+          <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg lg:rounded-xl flex items-center justify-center shadow-md">
+            <svg class="w-5 h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 8h10M7 12h4m1 8l-1-1v-1a1 1 0 011-1h2a1 1 0 011 1v1l-1 1"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 font-playfair">Répertoire des Comptes</h2>
+            <p class="text-slate-600 text-sm lg:text-base font-medium">Gestion des actifs financiers EgaBank</p>
+          </div>
+        </div>
       </div>
-      <div class="text-right pt-6">
-        <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-5 py-3 rounded-xl border border-blue-500/20 shadow-inner">
-          {{comptes.length}} Enregistrements
-        </span>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4 lg:gap-6">
+        <div class="w-full sm:w-auto space-y-2">
+          <label class="block text-slate-800 text-sm font-bold">Filtrer par type</label>
+          <select [value]="type" (change)="onSelectTypeCompte($event)"
+            class="w-full sm:w-auto bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-3 py-2.5 lg:px-4 lg:py-3 text-sm lg:text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all min-w-[200px]">
+            <option value="">Tous les comptes</option>
+            <option value="CC">Compte Courant</option>
+            <option value="CE">Compte Épargne</option>
+          </select>
+        </div>
+        <div class="text-center">
+          <span class="inline-flex items-center px-3 py-2 lg:px-4 lg:py-3 bg-blue-100 text-blue-800 rounded-lg text-sm font-bold border-2 border-blue-200">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            {{comptes.length}} Enregistrements
+          </span>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Table responsive -->
   <div class="overflow-x-auto">
-    <table class="w-full text-left border-separate border-spacing-y-0">
+    <table class="w-full">
       <thead>
-        <tr class="text-slate-500 text-[11px] uppercase tracking-[0.2em] bg-slate-950/20">
-          <th class="px-8 py-6 font-black border-b border-slate-800/50">Titulaire</th>
-          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">N° Compte</th>
-          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-right">Solde (FCFA)</th>
-          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Création</th>
-          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Statut</th>
-          <th class="px-8 py-6 font-black border-b border-slate-800/50 text-center">Actions</th>
+        <tr class="bg-slate-100 border-b-2 border-slate-200">
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-left text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide">Titulaire</th>
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-center text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide">N° Compte</th>
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-right text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide">Solde (FCFA)</th>
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-center text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide hidden sm:table-cell">Création</th>
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-center text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide">Statut</th>
+          <th class="px-3 py-3 lg:px-6 lg:py-4 text-center text-xs lg:text-sm font-bold text-slate-800 uppercase tracking-wide">Actions</th>
         </tr>
       </thead>
 
-      <tbody class="divide-y divide-slate-800/30">
-        <tr *ngFor="let c of comptes" class="hover:bg-blue-600/[0.03] transition-all group">
+      <tbody class="divide-y divide-slate-200">
+        <tr *ngFor="let c of comptes" class="hover:bg-slate-50 transition-all duration-200">
 
-          <td class="px-8 py-6">
-            <div class="flex items-center gap-4 text-white font-bold text-sm">
-              <div class="w-10 h-10 rounded-full border border-slate-700 overflow-hidden bg-slate-800 flex-shrink-0 shadow-lg">
+          <!-- Titulaire - Responsive -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4">
+            <div class="flex items-center gap-2 lg:gap-4">
+              <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-full border-2 border-slate-200 overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm">
                 <img [src]="c?.client?.sexe === 'M' ? 'assets/profil.jpg' : 'assets/profile.jpg'"
                      class="w-full h-full object-cover">
               </div>
-              <span class="truncate">{{c?.client?.nom}} {{c?.client?.prenom}}</span>
+              <div class="min-w-0">
+                <p class="text-sm lg:text-base font-bold text-slate-900 truncate">{{c?.client?.nom}} {{c?.client?.prenom}}</p>
+                <p class="text-xs lg:text-sm text-slate-600 font-medium">{{c?.client?.sexe === 'M' ? 'Monsieur' : 'Madame'}}</p>
+              </div>
             </div>
           </td>
 
-          <td class="px-8 py-6 text-center">
-            <span class="font-mono text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+          <!-- Numéro de compte -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4 text-center">
+            <span class="font-mono text-xs lg:text-sm font-bold text-slate-700 bg-slate-100 px-2 py-1 lg:px-3 lg:py-2 rounded-lg border border-slate-200 block sm:inline">
               {{c.numCompte}}
             </span>
           </td>
 
-          <td class="px-8 py-6 text-right font-black text-white text-lg">
-            {{c.balance | number:'1.0-0'}}
+          <!-- Solde -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4 text-right">
+            <div class="text-right">
+              <span class="text-sm lg:text-lg font-bold text-slate-900 block">{{c.balance | number:'1.0-0'}}</span>
+              <span class="text-xs lg:text-sm text-slate-600">FCFA</span>
+            </div>
           </td>
 
-          <td class="px-8 py-6 text-center text-slate-400 font-mono text-xs">
-            {{c.createdAt | date:'dd/MM/yyyy'}}
+          <!-- Date de création - Masqué sur mobile -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4 text-center hidden sm:table-cell">
+            <span class="text-xs lg:text-sm font-medium text-slate-700">{{c.createdAt | date:'dd/MM/yyyy'}}</span>
           </td>
 
-          <td class="px-8 py-6 text-center">
-            <span *ngIf="c.status === 'ACTIVATED'" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-tighter">
-              ● Actif
+          <!-- Statut -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4 text-center">
+            <span *ngIf="c.status === 'ACTIVATED'" class="inline-flex items-center px-2 py-1 lg:px-3 lg:py-1 rounded-full text-xs lg:text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span class="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-emerald-500 rounded-full mr-1 lg:mr-2"></span>
+              <span class="hidden sm:inline">Actif</span>
+              <span class="sm:hidden">✓</span>
             </span>
-            <span *ngIf="c.status === 'SUSPENDED'" class="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-tighter">
-              ● Suspendu
+            <span *ngIf="c.status === 'SUSPENDED'" class="inline-flex items-center px-2 py-1 lg:px-3 lg:py-1 rounded-full text-xs lg:text-sm font-bold bg-red-100 text-red-800 border border-red-200">
+              <span class="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-red-500 rounded-full mr-1 lg:mr-2"></span>
+              <span class="hidden sm:inline">Suspendu</span>
+              <span class="sm:hidden">✕</span>
             </span>
           </td>
 
-          <td class="px-8 py-6 text-center">
-            <div class="flex justify-center gap-2">
+          <!-- Actions -->
+          <td class="px-3 py-3 lg:px-6 lg:py-4 text-center">
+            <div class="flex justify-center gap-1 lg:gap-2">
               <button *ngIf="c.status === 'ACTIVATED'" (click)="onSuspendCompte(c.numCompte)"
-                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-rose-500 hover:text-white border border-slate-700 transition-all shadow-md active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="p-1.5 lg:p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 transition-all duration-200 hover:shadow-md touch-target"
+                title="Suspendre le compte">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 lg:h-5 lg:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
               </button>
 
               <button *ngIf="c.status === 'SUSPENDED'" (click)="onActiveCompte(c.numCompte)"
-                class="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white border border-slate-700 transition-all shadow-md active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                class="p-1.5 lg:p-2 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border border-emerald-200 transition-all duration-200 hover:shadow-md touch-target"
+                title="Activer le compte">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 lg:h-5 lg:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </button>
@@ -97,5 +128,16 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Message si aucun compte - Responsive -->
+  <div *ngIf="comptes.length === 0" class="p-8 lg:p-12 text-center">
+    <div class="w-12 h-12 lg:w-16 lg:h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-6 h-6 lg:w-8 lg:h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h2M7 8h10M7 12h4m1 8l-1-1v-1a1 1 0 011-1h2a1 1 0 011 1v1l-1 1"></path>
+      </svg>
+    </div>
+    <h3 class="text-base lg:text-lg font-bold text-slate-700 mb-2">Aucun compte trouvé</h3>
+    <p class="text-sm lg:text-base text-slate-500 font-medium">Aucun compte ne correspond aux critères sélectionnés.</p>
   </div>
 </div>

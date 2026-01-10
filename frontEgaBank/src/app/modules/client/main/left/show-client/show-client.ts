@@ -1,7 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Ajout de ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Client } from '../../../../../core/models/client';
 import { ClientService } from '../../../../../core/services/client.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-show-client',
@@ -10,17 +12,40 @@ import { ClientService } from '../../../../../core/services/client.service';
   templateUrl: './show-client.html',
   styleUrl: './show-client.scss',
 })
-export class ShowClient implements OnInit {
+export class ShowClient implements OnInit, OnDestroy {
 
   clients: Client[] = [];
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private clientService: ClientService,
-    private cdr: ChangeDetectorRef 
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.onGetClients();
+    this.setupNotificationSubscriptions();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private setupNotificationSubscriptions(): void {
+    // Écouter les notifications de clients
+    const clientSub = this.notificationService.clientUpdate$.subscribe(() => {
+      this.onGetClients();
+    });
+
+    // Écouter les rafraîchissements forcés
+    const refreshSub = this.notificationService.refresh$.subscribe((component) => {
+      if (component === 'clients' || component === 'all') {
+        this.onGetClients();
+      }
+    });
+
+    this.subscriptions.push(clientSub, refreshSub);
   }
 
   onGetClients(): void {

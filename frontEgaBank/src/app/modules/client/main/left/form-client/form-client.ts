@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService } from '../../../../../core/services/client.service';
 import { Client } from '../../../../../core/models/client';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { FormCompte } from "./form-compte/form-compte";
 
 @Component({
@@ -23,7 +24,8 @@ export class FormClient implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private clientService: ClientService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -88,5 +90,15 @@ export class FormClient implements OnInit {
     this.isSuccessed = true;
     this.showCompteForm = true;
     this.cdr.detectChanges();
+    
+    // 🔄 NOTIFICATION EN TEMPS RÉEL - Nouveau client créé
+    this.notificationService.notifyClientUpdate({
+      id: this.idClient,
+      nom: this.name,
+      action: 'create'
+    });
+    
+    // Forcer le rafraîchissement de la liste des clients
+    this.notificationService.forceRefresh('clients');
   }
 }

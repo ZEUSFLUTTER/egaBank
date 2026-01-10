@@ -1,52 +1,70 @@
-<div class="relative flex flex-col min-w-0 h-screen w-full bg-slate-900 border-r border-slate-800 overflow-hidden shadow-2xl">
+<div class="flex flex-col h-screen w-full bg-white border-r-2 border-slate-200 shadow-lg">
 
-  <img src="assets/bank.png" alt="Bank Header" class="w-full h-48 object-cover align-middle opacity-80">
-
-  <div class="p-8 flex-grow">
-    <blockquote class="relative">
-      <div class="flex items-center gap-3 mb-8">
-        <div class="w-1.5 h-8 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.5)]"></div>
-        <h2 class="text-2xl font-black text-white tracking-tight uppercase">Opérations</h2>
-      </div>
-
-      <ul class="space-y-4 font-light text-slate-300">
-
-        <li (click)="onClickVersement()" class="group flex items-center p-4 rounded-2xl hover:bg-emerald-600/10 hover:text-emerald-400 transition-all cursor-pointer border border-transparent hover:border-emerald-500/20">
-          <span class="mr-4 p-3 rounded-xl bg-slate-800 group-hover:bg-emerald-600/20 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
-          </span>
-          <span class="text-lg font-semibold tracking-wide">Versement</span>
-        </li>
-
-        <li (click)="onClickRetrait()" class="group flex items-center p-4 rounded-2xl hover:bg-rose-600/10 hover:text-rose-400 transition-all cursor-pointer border border-transparent hover:border-rose-500/20">
-          <span class="mr-4 p-3 rounded-xl bg-slate-800 group-hover:bg-rose-600/20 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </span>
-          <span class="text-lg font-semibold tracking-wide">Retrait</span>
-        </li>
-
-        <li (click)="onClickVirement()" class="group flex items-center p-4 rounded-2xl hover:bg-blue-600/10 hover:text-blue-400 transition-all cursor-pointer border border-transparent hover:border-blue-500/20">
-          <span class="mr-4 p-3 rounded-xl bg-slate-800 group-hover:bg-blue-600/20 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          </span>
-          <span class="text-lg font-semibold tracking-wide">Virement</span>
-        </li>
-
-
-      </ul>
-    </blockquote>
+  <div class="relative">
+    <img src="assets/bank.png" alt="Bank Header" class="w-full h-48 object-cover">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
   </div>
 
-  <div class="px-8 py-6 bg-slate-950/50 border-t border-slate-800">
-    <div class="flex items-center gap-2">
-      <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-      <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black">EgaBank Cloud Services</p>
+  <div class="p-8 flex-grow">
+    <div class="mb-8">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-2 h-12 bg-gradient-to-b from-primary-500 to-primary-600 rounded-full shadow-lg"></div>
+        <h2 class="text-2xl font-bold text-slate-900 font-playfair">Opérations</h2>
+      </div>
+      <p class="text-slate-600 font-medium">Choisissez le type d'opération à effectuer</p>
+    </div>
+
+    <ul class="space-y-4">
+
+      <li (click)="onClickVersement()" class="group cursor-pointer">
+        <div class="flex items-center p-5 rounded-xl bg-white border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200 hover:shadow-md">
+          <div class="mr-5 p-4 rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <div class="flex-grow">
+            <h3 class="text-lg font-bold text-slate-900 group-hover:text-emerald-800 mb-1">Versement</h3>
+            <p class="text-sm text-slate-600 group-hover:text-emerald-700 font-medium">Déposer de l'argent sur un compte</p>
+          </div>
+        </div>
+      </li>
+
+      <li (click)="onClickRetrait()" class="group cursor-pointer">
+        <div class="flex items-center p-5 rounded-xl bg-white border-2 border-rose-200 hover:border-rose-300 hover:bg-rose-50 transition-all duration-200 hover:shadow-md">
+          <div class="mr-5 p-4 rounded-xl bg-rose-100 group-hover:bg-rose-200 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
+            </svg>
+          </div>
+          <div class="flex-grow">
+            <h3 class="text-lg font-bold text-slate-900 group-hover:text-rose-800 mb-1">Retrait</h3>
+            <p class="text-sm text-slate-600 group-hover:text-rose-700 font-medium">Retirer de l'argent d'un compte</p>
+          </div>
+        </div>
+      </li>
+
+      <li (click)="onClickVirement()" class="group cursor-pointer">
+        <div class="flex items-center p-5 rounded-xl bg-white border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 hover:shadow-md">
+          <div class="mr-5 p-4 rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+          </div>
+          <div class="flex-grow">
+            <h3 class="text-lg font-bold text-slate-900 group-hover:text-blue-800 mb-1">Virement</h3>
+            <p class="text-sm text-slate-600 group-hover:text-blue-700 font-medium">Transférer des fonds entre comptes</p>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+
+  <div class="px-8 py-6 bg-gradient-to-r from-slate-100 to-blue-100 border-t-2 border-slate-200">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <p class="text-sm text-slate-700 uppercase tracking-wide font-bold">EgaBank Cloud Services</p>
     </div>
   </div>
 </div>

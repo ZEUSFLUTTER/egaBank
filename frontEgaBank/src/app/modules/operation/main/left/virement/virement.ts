@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
 import { Operation } from '../../../../../core/models/operation';
 import { Operation as OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-virement',
@@ -13,7 +15,7 @@ import { Compte } from '../../../../../core/models/comptes';
   templateUrl: './virement.html',
   styleUrl: './virement.scss',
 })
-export class Virement implements OnInit {
+export class Virement implements OnInit, OnDestroy {
   public opForm!: FormGroup;
   public submitted = false;
   compteSource!: Compte;
@@ -25,10 +27,13 @@ export class Virement implements OnInit {
   isSuccessed = false;
   isError = '';
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private compteService: CompteService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +43,10 @@ export class Virement implements OnInit {
       numCompteD: ['', [Validators.required]],
       type: ['', [Validators.required]]
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   get fb(): any {
@@ -53,6 +62,13 @@ export class Virement implements OnInit {
       return;
     }
 
+    const operationData = {
+      numCompteSource: this.fb.numCompteS.value,
+      numCompteDestination: this.fb.numCompteD.value,
+      amount: this.fb.montant.value,
+      type: 'VIREMENT'
+    };
+
     this.operationService.effectuerVirement(<Operation>{
       numCompteSource: this.fb.numCompteS.value,
       numCompteDestination: this.fb.numCompteD.value,
@@ -65,6 +81,22 @@ export class Virement implements OnInit {
         this.submitted = false;
         this.showSourceDetails = false;
         this.showDestDetails = false;
+
+        // 🔄 NOTIFICATION EN TEMPS RÉEL
+        this.notificationService.notifyOperationSuccess('Virement', {
+          ...operationData,
+          compteSource: this.compteSource,
+          compteDest: this.compteDest
+        });
+
+        // Forcer le rafraîchissement des composants liés
+        this.notificationService.forceRefresh('comptes');
+        this.notificationService.forceRefresh('operations');
+
+        // Réinitialiser après 3 secondes
+        setTimeout(() => {
+          this.isSuccessed = false;
+        }, 3000);
       },
       error: (err: any) => {
         this.isError = err.error?.message || "Erreur lors du virement";

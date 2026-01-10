@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/cor
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CompteService } from './../../../../../../core/services/compte.service';
+import { NotificationService } from './../../../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-form-compte',
@@ -22,7 +23,11 @@ export class FormCompte implements OnInit, OnChanges {
   public isCourant: boolean = true;
   public isEpargne: boolean = false;
 
-  constructor(private fb: FormBuilder, private compteService: CompteService) { }
+  constructor(
+    private fb: FormBuilder, 
+    private compteService: CompteService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -74,6 +79,16 @@ export class FormCompte implements OnInit, OnChanges {
         this.isSuccessed = true;
         this.compteForm.disable();
         console.log("Compte créé !", data);
+        
+        // 🔄 NOTIFICATION EN TEMPS RÉEL - Nouveau compte créé
+        this.notificationService.notifyCompteUpdate({
+          ...payload,
+          numCompte: data?.numCompte || 'nouveau',
+          action: 'create'
+        });
+        
+        // Forcer le rafraîchissement de la liste des comptes
+        this.notificationService.forceRefresh('comptes');
       },
       error: (err) => {
         console.error('Erreur:', err);

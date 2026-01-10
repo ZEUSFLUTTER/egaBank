@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
 import { Operation } from '../../../../../core/models/operation';
 import { Operation as OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-retrait',
@@ -13,7 +15,7 @@ import { Compte } from '../../../../../core/models/comptes';
   templateUrl: './retrait.html',
   styleUrl: './retrait.scss',
 })
-export class Retrait implements OnInit {
+export class Retrait implements OnInit, OnDestroy {
   public opForm!: FormGroup;
   public submitted = false;
   compte!: Compte;
@@ -22,10 +24,13 @@ export class Retrait implements OnInit {
   isSuccessed: boolean = false;
   isError: string = '';
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private compteService: CompteService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -34,6 +39,10 @@ export class Retrait implements OnInit {
       numCompte: ['', [Validators.required]],
       type: ['', [Validators.required]]
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   get fb(): any {
@@ -47,6 +56,12 @@ export class Retrait implements OnInit {
       return;
     }
 
+    const operationData = {
+      numCompteSource: this.fb.numCompte.value,
+      amount: this.fb.montant.value,
+      type: 'RETRAIT'
+    };
+
     this.operationService.effectuerRetrait(<Operation>{
       numCompteSource: this.fb.numCompte.value,
       amount: this.fb.montant.value
@@ -57,6 +72,21 @@ export class Retrait implements OnInit {
         this.opForm.reset();
         this.submitted = false;
         this.showDetails = false;
+
+        // 🔄 NOTIFICATION EN TEMPS RÉEL
+        this.notificationService.notifyOperationSuccess('Retrait', {
+          ...operationData,
+          compte: this.compte
+        });
+
+        // Forcer le rafraîchissement des composants liés
+        this.notificationService.forceRefresh('comptes');
+        this.notificationService.forceRefresh('operations');
+
+        // Réinitialiser après 3 secondes
+        setTimeout(() => {
+          this.isSuccessed = false;
+        }, 3000);
       },
       error: (err: any) => {
         this.isError = err.error?.message || "Erreur lors du retrait";

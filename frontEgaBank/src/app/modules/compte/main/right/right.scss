@@ -1,0 +1,108 @@
+/* Animations personnalisées pour le module compte */
+
+.group {
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Animation pour les icônes avec rotation légère */
+.group:hover svg {
+  animation: rotate-bounce 0.6s ease-in-out;
+}
+
+@keyframes rotate-bounce {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(5deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Effet de vague sur les cartes */
+.group::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  transition: all 0.6s ease;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.group:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Amélioration des statistiques avec indicateurs colorés */
+.stats-card {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #10b981, #059669);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stats-card:hover::before {
+  opacity: 1;
+}
+
+/* Animation spéciale pour le footer */
+.animate-pulse {
+  animation: pulse-emerald 2s ease-in-out infinite;
+}
+
+@keyframes pulse-emerald {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+/* Effet de gradient animé sur le header */
+.header-gradient {
+  background: linear-gradient(-45deg, #059669, #10b981, #34d399, #6ee7b7);
+  background-size: 400% 400%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

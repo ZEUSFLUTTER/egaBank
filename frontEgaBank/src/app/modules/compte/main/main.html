@@ -1,25 +1,32 @@
-<section class="h-screen w-full bg-[#0a0f1c] text-slate-300 flex overflow-hidden font-sans">
+<section class="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 text-slate-800 flex flex-col lg:flex-row overflow-hidden font-inter">
 
-  <aside class="w-[380px] h-full flex-none border-r border-slate-800 bg-slate-900 overflow-y-auto custom-scrollbar">
+  <!-- Navigation (Right) - En haut sur mobile, à droite sur desktop -->
+  <aside class="w-full lg:w-[380px] xl:w-[420px] h-auto lg:h-full flex-none border-b lg:border-b-0 lg:border-r border-slate-200 bg-white/90 backdrop-blur-sm overflow-y-auto custom-scrollbar shadow-lg order-1">
     <app-right (isListed)="showList($event)" (isHistorique)="showHistoric($event)"></app-right>
   </aside>
 
-  <main class="flex-grow h-full overflow-y-auto bg-[#0a0f1c] relative">
+  <!-- Contenu Principal (Left) - En bas sur mobile, à gauche sur desktop -->
+  <main class="flex-grow h-full lg:h-full overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 relative custom-scrollbar order-2">
 
-    <div class="sticky top-0 z-50 h-1.5 w-full bg-slate-900/50 backdrop-blur-md">
-      <div class="h-full bg-blue-600 w-1/3 shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
+    <!-- Progress Bar -->
+    <div class="sticky top-0 z-50 h-2 lg:h-3 w-full bg-white/50 backdrop-blur-md shadow-sm">
+      <div class="h-full bg-gradient-to-r from-primary-500 to-primary-600 w-1/3 shadow-lg shadow-primary-500/30 rounded-r-full transition-all duration-500"></div>
     </div>
 
-    <div class="p-8 lg:p-12">
-      <div class="max-w-[1600px] mx-auto"> <div class="relative min-h-[calc(100vh-100px)]">
+    <!-- Content Container -->
+    <div class="p-4 sm:p-6 lg:p-8 xl:p-12">
+      <div class="max-w-[1600px] mx-auto">
+        <div class="relative min-h-[calc(100vh-120px)] lg:min-h-[calc(100vh-100px)]">
 
-          <div class="animate-in fade-in duration-700 h-full">
+          <!-- Default Info View -->
+          <div class="animate-fade-in h-full">
             <app-info *ngIf="!isList && !isHistoric"></app-info>
           </div>
 
-          <div class="animate-in fade-in slide-in-from-right-10 duration-500">
-            <div class="bg-slate-900/40 border border-slate-800/60 rounded-[2.5rem] shadow-2xl backdrop-blur-sm">
-              <app-left  *ngIf="isList || isHistoric" [isListed]="isList" [isHistoric]="isHistoric" ></app-left>
+          <!-- List/Historic Views -->
+          <div class="animate-in slide-in-from-right-10 duration-500" *ngIf="isList || isHistoric">
+            <div class="card-light p-4 sm:p-6 lg:p-8 shadow-xl border-0 bg-white/95 backdrop-blur-sm rounded-xl lg:rounded-2xl">
+              <app-left [isListed]="isList" [isHistoric]="isHistoric"></app-left>
             </div>
           </div>
 

@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Operation } from '../../../../../core/models/operation';
 import { Operation as OperationService } from '../../../../../core/services/operation.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { Subscription } from 'rxjs';
 import jsPDF from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 
@@ -13,19 +15,61 @@ import autoTable, { RowInput } from 'jspdf-autotable';
   templateUrl: './historique.html',
   styleUrl: './historique.scss',
 })
-export class Historique implements OnInit {
+export class Historique implements OnInit, OnDestroy {
   public searchForm!: FormGroup;
   public ops: Operation[] = [];
   public isError: string = '';
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
     this.searchForm = this.formBuilder.group({
       numCompte: ['', [Validators.required]]
+    });
+    this.setupNotificationSubscriptions();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private setupNotificationSubscriptions(): void {
+    // Écouter les notifications d'opérations pour rafraîchir l'historique
+    const operationSub = this.notificationService.operationUpdate$.subscribe(() => {
+      const numCompte = this.searchForm.value.numCompte;
+      if (numCompte && numCompte.trim() !== '') {
+        this.refreshOperations(numCompte);
+      }
+    });
+
+    // Écouter les rafraîchissements forcés
+    const refreshSub = this.notificationService.refresh$.subscribe((component) => {
+      if (component === 'operations' || component === 'all') {
+        const numCompte = this.searchForm.value.numCompte;
+        if (numCompte && numCompte.trim() !== '') {
+          this.refreshOperations(numCompte);
+        }
+      }
+    });
+
+    this.subscriptions.push(operationSub, refreshSub);
+  }
+
+  private refreshOperations(numCompte: string): void {
+    this.operationService.getOperationsByCompte(numCompte).subscribe({
+      next: (oper: Operation[]) => {
+        this.ops = oper;
+        this.isError = '';
+      },
+      error: (err: any) => {
+        this.ops = [];
+        this.isError = err.error?.message || "Aucune donnée trouvée pour ce compte";
+      }
     });
   }
 
@@ -35,15 +79,7 @@ export class Historique implements OnInit {
     this.isError = '';
 
     if (value && value.trim() !== '') {
-      this.operationService.getOperationsByCompte(value).subscribe({
-        next: (oper: Operation[]) => {
-          this.ops = oper;
-        },
-        error: (err: any) => {
-          this.ops = [];
-          this.isError = err.error?.message || "Aucune donnée trouvée pour ce compte";
-        }
-      });
+      this.refreshOperations(value);
     }
   }
 
