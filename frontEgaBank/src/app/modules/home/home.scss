@@ -1,0 +1,60 @@
+.app-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 100vh;
+  width: calc(100% - 280px);
+  margin-left: 280px;
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: all 0.3s ease-in-out;
+}
+
+// When sidebar is collapsed
+:host-context(.sidebar.collapsed) ~ .main-content {
+  width: calc(100% - 80px);
+  margin-left: 80px;
+}
+
+.content-wrapper {
+  width: 100%;
+  max-width: 100%;
+  animation: fadeIn 0.3s ease-out;
+  padding: 0;
+}
+
+// Responsive adjustments
+@media (max-width: 1024px) {
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+    padding-top: 4rem;
+  }
+  
+  .content-wrapper {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

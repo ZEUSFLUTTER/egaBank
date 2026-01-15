@@ -1,5 +1,20 @@
-<app-header></app-header>
-
-<main class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-  <router-outlet></router-outlet>
-</main>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <app-sidebar #sidebarRef></app-sidebar>
+  
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Mobile Menu Button -->
+    <button 
+      (click)="toggleMobileMenu()"
+      class="lg:hidden fixed top-4 left-4 z-30 p-3 bg-slate-900 text-white rounded-xl shadow-lg hover:bg-slate-800 transition-colors duration-200">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+    
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

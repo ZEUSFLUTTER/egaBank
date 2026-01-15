@@ -10,20 +10,20 @@ import { Component, Output, EventEmitter } from '@angular/core';
 })
 export class Right {
 
-  @Output() isVersement = new EventEmitter<boolean>();
-  @Output() isRetrait = new EventEmitter<boolean>();
-  @Output() isVirement = new EventEmitter<boolean>();
+  @Output() onVersement = new EventEmitter<boolean>();
+  @Output() onRetrait = new EventEmitter<boolean>();
+  @Output() onVirement = new EventEmitter<boolean>();
 
   onClickVersement() {
-    this.isVersement.emit(true);
+    this.onVersement.emit(true);
   }
 
   onClickRetrait() {
-    this.isRetrait.emit(true);
-  }
-    onClickVirement() {
-    this.isVirement.emit(true);
+    this.onRetrait.emit(true);
   }
 
+  onClickVirement() {
+    this.onVirement.emit(true);
+  }
 
 }

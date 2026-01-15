@@ -1,15 +1,20 @@
-import { Component } from '@angular/core';
-import { Header } from "../../shared/modules/header/header";
-import { Footer } from "../../shared/modules/footer/footer";
-import { Main } from "./main/main";
-import { ClientRoutingModule } from "../client/client-routing-module";
+import { Component, ViewChild } from '@angular/core';
+import { Sidebar } from "../../shared/modules/sidebar/sidebar";
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [Header, Footer, Main, ClientRoutingModule],
+  imports: [Sidebar, RouterOutlet, CommonModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home {
+  @ViewChild('sidebarRef') sidebarRef!: Sidebar;
 
+  toggleMobileMenu() {
+    if (this.sidebarRef) {
+      this.sidebarRef.toggleMobileMenu();
+    }
+  }
 }

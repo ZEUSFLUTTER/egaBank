@@ -1,0 +1,177 @@
+<!-- Mobile Overlay -->
+<div
+  *ngIf="isMobileMenuOpen()"
+  (click)="closeMobileMenu()"
+  class="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300">
+</div>
+
+<aside
+  [class.collapsed]="isCollapsed()"
+  [class.mobile-open]="isMobileMenuOpen()"
+  class="sidebar h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl transition-all duration-300 ease-in-out z-50 overflow-hidden">
+
+  <!-- Logo Section -->
+  <div class="sidebar-header p-6 border-b border-slate-700/50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3" [class.justify-center]="isCollapsed()">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+          </svg>
+        </div>
+        <div [class.hidden]="isCollapsed()" class="transition-opacity duration-200">
+          <h1 class="text-xl font-bold text-white">
+            Ega<span class="text-blue-400">Bank</span>
+          </h1>
+          <p class="text-xs text-slate-400">Système de Gestion</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <!-- Mobile close button -->
+        <button
+          (click)="closeMobileMenu()"
+          class="lg:hidden p-2 hover:bg-slate-700/50 rounded-lg transition-colors duration-200 flex-shrink-0">
+          <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <!-- Desktop collapse button -->
+        <button
+          (click)="toggleSidebar()"
+          class="hidden lg:block p-2 hover:bg-slate-700/50 rounded-lg transition-colors duration-200 flex-shrink-0"
+          [class.ml-auto]="isCollapsed()"
+          [class.mx-auto]="isCollapsed()">
+          <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path *ngIf="!isCollapsed()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+            <path *ngIf="isCollapsed()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Profile Section -->
+  <div class="sidebar-user p-4 border-b border-slate-700/50" *ngIf="adminUser">
+    <div class="flex items-center" [class.justify-center]="isCollapsed()" [class.space-x-3]="!isCollapsed()">
+      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg flex-shrink-0">
+        {{ adminUser.username?.charAt(0).toUpperCase() || 'A' }}
+      </div>
+      <div class="flex-1 min-w-0" [class.hidden]="isCollapsed()">
+        <p class="text-sm font-semibold text-white truncate">{{ adminUser.username || 'Admin' }}</p>
+        <p class="text-xs text-slate-400 truncate">Administrateur</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
+    <ul class="space-y-2">
+      <li *ngFor="let item of navItems">
+        <!-- Item avec sous-menus -->
+        <div *ngIf="item.subItems && item.subItems.length > 0">
+          <!-- Bouton principal pour expand/collapse -->
+          <button
+            (click)="toggleSubMenu(item.title, $event)"
+            type="button"
+            class="nav-item w-full flex items-center justify-between space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden cursor-pointer">
+
+            <div class="flex items-center space-x-3 flex-1">
+              <!-- Active indicator -->
+              <span class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full transform scale-y-0 transition-transform duration-200"
+                    [class.scale-y-100]="isExpanded(item.title)"></span>
+
+              <!-- Icon -->
+              <div class="nav-icon flex-shrink-0 w-5 h-5 text-slate-400 group-hover:text-blue-400 transition-colors duration-200"
+                   [class.text-blue-400]="isExpanded(item.title)">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
+                </svg>
+              </div>
+
+              <!-- Label -->
+              <span
+                [class.hidden]="isCollapsed()"
+                class="nav-label text-sm font-medium text-slate-300 group-hover:text-white transition-colors duration-200 whitespace-nowrap"
+                [class.text-white]="isExpanded(item.title)">
+                {{ item.title }}
+              </span>
+            </div>
+
+            <!-- Chevron icon -->
+            <svg
+              [class.hidden]="isCollapsed()"
+              class="w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0"
+              [class.rotate-90]="isExpanded(item.title)"
+              [class.text-blue-400]="isExpanded(item.title)"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+
+            <!-- Hover effect background -->
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl"
+                 [class.opacity-100]="isExpanded(item.title)"></div>
+          </button>
+
+          <!-- Sous-menus -->
+          <ul
+            *ngIf="!isCollapsed()"
+            class="submenu ml-4 mt-2 space-y-1 overflow-hidden transition-all duration-300"
+            [class.submenu-expanded]="isExpanded(item.title)"
+            [class.submenu-collapsed]="!isExpanded(item.title)">
+            <li *ngFor="let subItem of item.subItems">
+              <button
+                (click)="handleSubItemClick(item, subItem, $event)"
+                type="button"
+                class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all duration-200 group cursor-pointer">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 group-hover:bg-blue-400 transition-colors"></span>
+                <span class="flex-1 text-left">{{ subItem.title }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Item simple sans sous-menus -->
+        <a
+          *ngIf="!item.subItems || item.subItems.length === 0"
+          [routerLink]="item.path"
+          (click)="closeMobileMenu()"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: item.path === '/home'}"
+          class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden">
+
+          <!-- Active indicator -->
+          <span class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full transform scale-y-0 transition-transform duration-200 group-[.active]:scale-y-100"></span>
+
+          <!-- Icon -->
+          <div class="nav-icon flex-shrink-0 w-5 h-5 text-slate-400 group-hover:text-blue-400 group-[.active]:text-blue-400 transition-colors duration-200">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
+            </svg>
+          </div>
+
+          <!-- Label -->
+          <span
+            [class.hidden]="isCollapsed()"
+            class="nav-label text-sm font-medium text-slate-300 group-hover:text-white group-[.active]:text-white transition-colors duration-200 whitespace-nowrap">
+            {{ item.title }}
+          </span>
+
+          <!-- Hover effect background -->
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity duration-200 rounded-xl"></div>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer Section -->
+  <div class="sidebar-footer p-4 border-t border-slate-700/50">
+    <button
+      (click)="logout()"
+      class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-200 group">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+      </svg>
+      <span [class.hidden]="isCollapsed()" class="text-sm font-medium whitespace-nowrap">Déconnexion</span>
+    </button>
+  </div>
+</aside>

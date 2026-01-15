@@ -1,9 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Footer } from "../../../shared/modules/footer/footer";
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Left } from "./left/left";
-import { Header } from "../../../shared/modules/header/header";
-import { Right } from "./right/right";
 import { Info } from "./info/info";
 
 @Component({
@@ -11,19 +8,41 @@ import { Info } from "./info/info";
   standalone: true,
   imports: [
     CommonModule,
-
     Left,
-
-    Right,
     Info
   ],
   templateUrl: './main.html',
   styleUrl: './main.scss',
 })
-export class Main {
+export class Main implements OnInit, OnDestroy {
+  private sidebarListener?: (event: Event) => void;
 
   isAdd = false;
   isList = false;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.sidebarListener = (event: Event) => {
+        const customEvent = event as CustomEvent;
+        if (customEvent.detail?.module === 'clients') {
+          if (customEvent.detail?.action === 'liste') {
+            this.showClient(true);
+          } else if (customEvent.detail?.action === 'nouveau') {
+            this.addClient(true);
+          }
+        }
+      };
+      window.addEventListener('sidebar-action', this.sidebarListener);
+    }
+  }
+
+  ngOnDestroy() {
+    if (isPlatformBrowser(this.platformId) && this.sidebarListener) {
+      window.removeEventListener('sidebar-action', this.sidebarListener);
+    }
+  }
 
   addClient($event : boolean){
     this.isAdd = $event;

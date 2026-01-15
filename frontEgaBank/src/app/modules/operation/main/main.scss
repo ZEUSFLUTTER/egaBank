@@ -1,19 +1,9 @@
 /* Styles spécifiques pour le composant main des opérations */
 
-/* Animation pour la barre latérale */
-aside {
+/* Styles pour le contenu principal */
+main {
+  width: 100%;
   transition: all 0.3s ease;
-  position: relative;
-}
-
-aside::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1px;
-  height: 100%;
-  background: linear-gradient(180deg, transparent 0%, #e2e8f0 20%, #cbd5e1 50%, #e2e8f0 80%, transparent 100%);
 }
 
 /* Animation pour la zone principale */
@@ -115,30 +105,14 @@ main {
 
 /* Responsive design */
 @media (max-width: 1024px) {
-  aside {
-    width: 320px;
-  }
-  
   .main-content {
     padding: 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
-  section {
-    flex-direction: column;
-  }
-  
-  aside {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-    border-right: none;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  
   main {
-    height: calc(100vh - 300px);
+    padding: 1rem;
   }
   
   .progress-bar {

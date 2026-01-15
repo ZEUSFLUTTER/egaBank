@@ -641,3 +641,67 @@ a:hover {
     display: none;
   }
 }
+
+/* ===== LAYOUT AVEC SIDEBAR ===== */
+
+/* Assurer que le contenu principal utilise toute la largeur disponible */
+.main-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Optimisation pour les sections avec sidebar */
+section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Assurer que les conteneurs internes ne débordent pas */
+main {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Amélioration du layout 2 colonnes */
+.two-column-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .two-column-layout {
+    flex-direction: row;
+    gap: var(--spacing-xl);
+  }
+  
+  .two-column-layout .main-column {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .two-column-layout .sidebar-column {
+    flex: 0 0 320px;
+    width: 320px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .two-column-layout .sidebar-column {
+    flex: 0 0 384px;
+    width: 384px;
+  }
+}
+
+/* Éviter les débordements horizontaux */
+* {
+  max-width: 100%;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
