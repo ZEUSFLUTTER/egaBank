@@ -8,9 +8,10 @@ import { OperationService } from '../../core/services/operation.service';
 import { Compte, CreateCompteDto } from '../../core/models/comptes';
 import { Operation, OperationRequestDto, TypeOperation } from '../../core/models/operation';
 import { ClientStatus, LoginResponseDto } from '../../core/models/client';
-import { Subscription, interval } from 'rxjs';
+import { Subscription, interval, filter } from 'rxjs';
 import { DashboardService } from '../../core/services/dashboard';
 import { ClientService } from '../../core/services/client.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -43,6 +44,8 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
   operationForm: FormGroup;
 
   private pollingSub?: Subscription;
+  private refreshSub?: Subscription;
+  private isFetching = false;
 
   constructor(
     private fb: FormBuilder,
@@ -51,6 +54,7 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
     private operationService: OperationService,
     private dashboardService: DashboardService,
     private clientService: ClientService,
+    private notificationService: NotificationService,
     private router: Router
   ) {
     this.createCompteForm = this.fb.group({
@@ -100,11 +104,23 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
     // Premier chargement
     this.loadComptes();
 
-    // Polling léger côté composant pour rafraîchir la liste des comptes et opérations du compte sélectionné
-    this.pollingSub = interval(10000).subscribe(() => {
-      this.loadComptes();
-      if (this.selectedCompte) {
-        this.loadOperations(this.selectedCompte.numCompte);
+    // Rafraîchissement à la demande (opérations/compte)
+    this.refreshSub = this.notificationService.refresh$
+      .pipe(filter((target) => target === 'all' || target === 'comptes' || target === 'operations'))
+      .subscribe(() => {
+        this.loadComptes();
+        if (this.selectedCompte) {
+          this.loadOperations(this.selectedCompte.numCompte);
+        }
+      });
+
+    // Polling plus léger pour éviter la surcharge
+    this.pollingSub = interval(30000).subscribe(() => {
+      if (!this.isFetching) {
+        this.loadComptes();
+        if (this.selectedCompte) {
+          this.loadOperations(this.selectedCompte.numCompte);
+        }
       }
     });
   }
@@ -114,17 +130,24 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
       this.pollingSub.unsubscribe();
       this.pollingSub = undefined;
     }
+    if (this.refreshSub) {
+      this.refreshSub.unsubscribe();
+      this.refreshSub = undefined;
+    }
   }
 
   loadComptes() {
     if (!this.clientId) return;
 
+    if (this.isFetching) return;
+    this.isFetching = true;
     this.loading = true;
     this.compteService.getClientComptes(this.clientId).subscribe({
       next: (comptes) => {
         this.comptes = comptes;
         this.calculateTotalBalance();
         this.loading = false;
+        this.isFetching = false;
 
         if (comptes.length > 0 && !this.selectedCompte) {
           this.selectCompte(comptes[0]);
@@ -132,6 +155,7 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.loading = false;
+        this.isFetching = false;
         this.errorMessage = 'Erreur lors du chargement des comptes';
         console.error(error);
       }
@@ -229,6 +253,7 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
 
     this.operationService.effectuerOperation(this.clientId, operationDto).subscribe({
       next: (operation) => {
+        this.loading = false;
         this.updateFormDisabledState();
         this.successMessage = 'Opération effectuée avec succès !';
 
@@ -238,6 +263,8 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
           if (this.selectedCompte) {
             this.loadOperations(this.selectedCompte.numCompte);
           }
+          this.notificationService.forceRefresh('comptes');
+          this.notificationService.forceRefresh('operations');
         }, 1000);
       },
       error: (error) => {
