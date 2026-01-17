@@ -29,6 +29,10 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public CompteBancaire effectuerVersement(OperationDto dto) {
+        if (dto.getAmount() <= 0) {
+            throw new RuntimeException("Le montant doit être positif");
+        }
+        
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompteSource())
             .orElseThrow(() -> new RuntimeException("Ce compte n'existe pas"));
 
@@ -41,7 +45,7 @@ public class OperationServiceImpl implements OperationService {
 
         Operation operation = new Operation();
         operation.setDateOperation(new Date());
-        operation.setAmount(dto.getAmount());
+        operation.setAmount(Math.abs(dto.getAmount())); // S'assurer que le montant est positif
         operation.setTypeOperation(TypeOperation.DEPOT);
         operation.setCompte(compte);
         operation.setNumOperation(generateNumeroOperation());
@@ -63,6 +67,10 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public CompteBancaire effectuerRetrait(OperationDto dto) {
+        if (dto.getAmount() <= 0) {
+            throw new RuntimeException("Le montant doit être positif");
+        }
+        
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompteSource())
             .orElseThrow(() -> new RuntimeException("Ce compte n'existe pas"));
 
@@ -79,7 +87,7 @@ public class OperationServiceImpl implements OperationService {
 
         Operation operation = new Operation();
         operation.setDateOperation(new Date());
-        operation.setAmount(dto.getAmount());
+        operation.setAmount(Math.abs(dto.getAmount())); // S'assurer que le montant est positif
         operation.setTypeOperation(TypeOperation.RETRAIT);
         operation.setCompte(compte);
         operation.setNumOperation(generateNumeroOperation());
@@ -101,30 +109,120 @@ public class OperationServiceImpl implements OperationService {
 
     @Override
     public boolean effectuerVirement(OperationDto dto) {
-        String numCompteSource = dto.getNumCompteSource();
-        OperationDto dtoSource = new OperationDto(numCompteSource, null, dto.getAmount());
-        CompteBancaire compteBancaireSource = effectuerRetrait(dtoSource);
+        System.out.println("=== DEBUT VIREMENT SERVICE ===");
+        System.out.println("DTO reçu: " + dto);
         
-        if (compteBancaireSource != null) {
-            String numCompteDestination = dto.getNumCompteDestination();
-            OperationDto dtoDestination = new OperationDto(numCompteDestination, numCompteDestination, dto.getAmount());
-            effectuerVersement(dtoDestination);
-
-            if (compteBancaireSource.getClient().getEmail() != null) {
-                emailService.envoyerNotification(
-                    compteBancaireSource.getClient().getEmail(),
-                    "Confirmation de Virement - EgaBank",
-                    "Votre virement de " + dto.getAmount() + " FCFA vers le compte " + 
-                    numCompteDestination + " a été exécuté avec succès."
-                );
+        try {
+            // Validation des données d'entrée
+            if (dto.getAmount() <= 0) {
+                throw new RuntimeException("Le montant doit être positif");
             }
+            
+            if (dto.getNumCompteSource() == null || dto.getNumCompteSource().trim().isEmpty()) {
+                throw new RuntimeException("Le numéro de compte source est requis");
+            }
+            
+            if (dto.getNumCompteDestination() == null || dto.getNumCompteDestination().trim().isEmpty()) {
+                throw new RuntimeException("Le numéro de compte destination est requis");
+            }
+            
+            String numCompteSource = dto.getNumCompteSource();
+            String numCompteDestination = dto.getNumCompteDestination();
+            
+            System.out.println("Recherche du compte source: " + numCompteSource);
+            // Vérifier que les comptes existent
+            CompteBancaire compteSource = compteBancaireRepository.findByNumCompte(numCompteSource)
+                .orElseThrow(() -> new RuntimeException("Compte source n'existe pas"));
+            
+            System.out.println("Compte source trouvé: " + compteSource.getId() + ", Balance: " + compteSource.getBalance());
+            
+            System.out.println("Recherche du compte destination: " + numCompteDestination);
+            CompteBancaire compteDestination = compteBancaireRepository.findByNumCompte(numCompteDestination)
+                .orElseThrow(() -> new RuntimeException("Compte destination n'existe pas"));
+            
+            System.out.println("Compte destination trouvé: " + compteDestination.getId() + ", Balance: " + compteDestination.getBalance());
+
+            // Vérifier le statut des comptes
+            if (!compteSource.getStatus().equals(AccountStatus.ACTIVATED)) {
+                throw new RuntimeException("Le compte source est suspendu");
+            }
+            
+            if (!compteDestination.getStatus().equals(AccountStatus.ACTIVATED)) {
+                throw new RuntimeException("Le compte destination est suspendu");
+            }
+
+            // Vérifier le solde
+            if (compteSource.getBalance() < dto.getAmount()) {
+                throw new RuntimeException("Solde insuffisant");
+            }
+
+            System.out.println("Mise à jour des soldes...");
+            // Effectuer le virement
+            compteSource.setBalance(compteSource.getBalance() - dto.getAmount());
+            compteDestination.setBalance(compteDestination.getBalance() + dto.getAmount());
+            
+            // Sauvegarder les comptes
+            System.out.println("Sauvegarde des comptes...");
+            compteBancaireRepository.save(compteSource);
+            compteBancaireRepository.save(compteDestination);
+
+            System.out.println("Création de l'opération de débit...");
+            // Créer l'opération de débit pour le compte source
+            Operation operationDebit = new Operation();
+            operationDebit.setDateOperation(new Date());
+            operationDebit.setAmount(dto.getAmount()); // Utiliser le montant tel quel
+            operationDebit.setTypeOperation(TypeOperation.VIREMENT);
+            operationDebit.setCompte(compteSource);
+            operationDebit.setNumOperation(generateNumeroOperation());
+            
+            System.out.println("Opération débit: " + operationDebit.getAmount() + ", NumOp: " + operationDebit.getNumOperation());
+            
+            try {
+                operationRepository.save(operationDebit);
+                System.out.println("Opération débit sauvegardée avec succès");
+            } catch (Exception e) {
+                System.err.println("Erreur sauvegarde opération débit: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException("Erreur lors de l'enregistrement de l'opération de débit: " + e.getMessage());
+            }
+
+            System.out.println("Création de l'opération de crédit...");
+            // Créer l'opération de crédit pour le compte destination
+            Operation operationCredit = new Operation();
+            operationCredit.setDateOperation(new Date());
+            operationCredit.setAmount(dto.getAmount()); // Utiliser le montant tel quel
+            operationCredit.setTypeOperation(TypeOperation.VIREMENT);
+            operationCredit.setCompte(compteDestination);
+            operationCredit.setNumOperation(generateNumeroOperation());
+            
+            System.out.println("Opération crédit: " + operationCredit.getAmount() + ", NumOp: " + operationCredit.getNumOperation());
+            
+            try {
+                operationRepository.save(operationCredit);
+                System.out.println("Opération crédit sauvegardée avec succès");
+            } catch (Exception e) {
+                System.err.println("Erreur sauvegarde opération crédit: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException("Erreur lors de l'enregistrement de l'opération de crédit: " + e.getMessage());
+            }
+
+            System.out.println("=== VIREMENT TERMINE AVEC SUCCES ===");
             return true;
+            
+        } catch (Exception e) {
+            System.err.println("=== ERREUR VIREMENT SERVICE ===");
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
     @Override
     public Operation effectuerOperation(OperationRequestDto dto) {
+        if (dto.getAmount() <= 0) {
+            throw new RuntimeException("Le montant doit être positif");
+        }
+        
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompte())
             .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
 
@@ -134,7 +232,7 @@ public class OperationServiceImpl implements OperationService {
 
         Operation operation = new Operation();
         operation.setDateOperation(new Date());
-        operation.setAmount(dto.getAmount());
+        operation.setAmount(Math.abs(dto.getAmount())); // S'assurer que le montant est positif
         operation.setTypeOperation(dto.getTypeOperation());
         operation.setCompte(compte);
         operation.setNumOperation(generateNumeroOperation());

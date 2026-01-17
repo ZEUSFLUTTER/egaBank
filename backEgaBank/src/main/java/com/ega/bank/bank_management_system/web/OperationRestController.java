@@ -37,10 +37,35 @@ public class OperationRestController {
         return true;
     }
 
+    @GetMapping("/operations/test")
+    public String test(){
+        return "Operations endpoint is working!";
+    }
+
     @PostMapping("/operations/virement")
     public boolean virement(@RequestBody OperationDto dto){
-        this.operationService.effectuerVirement(dto);
-        return true;
+        System.out.println("=== VIREMENT CONTROLLER ===");
+        System.out.println("Virement endpoint called with: " + dto);
+        System.out.println("Amount: " + dto.getAmount());
+        System.out.println("Source: " + dto.getNumCompteSource());
+        System.out.println("Destination: " + dto.getNumCompteDestination());
+        
+        try {
+            boolean result = this.operationService.effectuerVirement(dto);
+            System.out.println("Virement result: " + result);
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error in virement controller: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PostMapping("/operations/virement-test")
+    public String virementTest(@RequestBody OperationDto dto){
+        System.out.println("=== VIREMENT TEST ===");
+        System.out.println("DTO received: " + dto);
+        return "DTO received successfully: " + dto.toString();
     }
 
     @GetMapping("/operations/client/{numCompte}")

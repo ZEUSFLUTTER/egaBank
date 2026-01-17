@@ -19,4 +19,14 @@ public class OperationDto {
         this.numCompteDestination = numCompteDestination;
         this.amount = amount;
     }
+    
+    @Override
+    public String toString() {
+        return "OperationDto{" +
+                "compteID=" + compteID +
+                ", amount=" + amount +
+                ", numCompteSource='" + numCompteSource + '\'' +
+                ", numCompteDestination='" + numCompteDestination + '\'' +
+                '}';
+    }
 }

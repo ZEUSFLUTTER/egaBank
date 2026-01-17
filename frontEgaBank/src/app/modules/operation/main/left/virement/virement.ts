@@ -61,18 +61,20 @@ export class Virement implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.fb.numCompteS.value === this.fb.numCompteD.value) {
+      this.isError = "Le compte source et le compte destination ne peuvent pas être identiques.";
+      return;
+    }
+
     const operationData = {
       numCompteSource: this.fb.numCompteS.value,
       numCompteDestination: this.fb.numCompteD.value,
-      amount: this.fb.montant.value,
-      type: 'VIREMENT'
+      amount: this.fb.montant.value
     };
 
-    this.operationService.effectuerVirement({
-      numCompteSource: this.fb.numCompteS.value,
-      numCompteDestination: this.fb.numCompteD.value,
-      amount: this.fb.montant.value
-    }).subscribe({
+    console.log('Données du virement:', operationData);
+
+    this.operationService.effectuerVirement(operationData).subscribe({
       next: () => {
         this.isError = '';
         this.isSuccessed = true;
@@ -82,8 +84,9 @@ export class Virement implements OnInit, OnDestroy {
         this.showDestDetails = false;
 
         // 🔄 NOTIFICATION EN TEMPS RÉEL
-        this.notificationService.notifyOperationSuccess('Virement', {
+        this.notificationService.notifyOperationSuccess('Virement effectué avec succès', {
           ...operationData,
+          type: 'VIREMENT',
           compteSource: this.compteSource,
           compteDest: this.compteDest
         });
@@ -98,7 +101,8 @@ export class Virement implements OnInit, OnDestroy {
         }, 3000);
       },
       error: (err: any) => {
-        this.isError = err.error?.message || "Erreur lors du virement";
+        console.error('Erreur virement:', err);
+        this.isError = err.error?.message || err.message || "Erreur lors du virement";
         this.isSuccessed = false;
       }
     });

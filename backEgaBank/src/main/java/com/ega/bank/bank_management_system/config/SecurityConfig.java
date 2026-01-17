@@ -31,7 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/clients/**").permitAll()
                 .requestMatchers("/api/v1/comptes/**").permitAll()
                 .requestMatchers("/api/v1/operations/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/v1/**").permitAll() // Add this line for debugging
+                .anyRequest().permitAll() // Change this temporarily for debugging
             );
 
         return http.build();
@@ -45,10 +46,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4201"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
