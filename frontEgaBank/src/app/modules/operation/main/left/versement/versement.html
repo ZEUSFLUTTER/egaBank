@@ -1,21 +1,27 @@
-<div class="max-w-4xl mx-auto p-6">
-  <div class="bg-white border-2 border-slate-200 rounded-2xl shadow-lg overflow-hidden">
-
-    <div class="p-8 border-b-2 border-slate-200 bg-gradient-to-r from-emerald-50 to-green-50">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
+<div class="space-y-6">
+  <div class="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-lg border border-slate-200">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900 font-playfair">Effectuer un Versement</h2>
+            <p class="text-slate-600 font-medium">Déposer de l'argent sur un compte client</p>
+          </div>
         </div>
-        <div>
-          <h2 class="text-2xl font-bold text-slate-900 font-playfair">Effectuer un Versement</h2>
-          <p class="text-slate-600 font-medium">Déposer de l'argent sur un compte client</p>
+
+        <!-- Loading Indicator -->
+        <div *ngIf="isLoading" class="flex items-center gap-2">
+          <div class="w-4 h-4 border-2 border-emerald-500 border-t-emerald-200 rounded-full animate-spin"></div>
+          <span class="text-sm font-semibold text-emerald-700">Traitement...</span>
         </div>
       </div>
     </div>
 
-    <form [formGroup]="opForm" (ngSubmit)="onSubmit()" class="p-8 space-y-8">
+  <form [formGroup]="opForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-6 rounded-lg border border-slate-200">
 
       <div *ngIf="isSuccessed"
         class="p-8 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 flex flex-col items-center gap-6 animate-fade-in">
@@ -39,7 +45,7 @@
           <div class="space-y-3">
             <label class="block text-slate-800 text-sm font-bold">Type de compte</label>
             <select formControlName="type"
-              class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-4 text-base font-medium focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all">
+              class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-4 text-base font-medium focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
               <option value="CC">Compte Courant</option>
               <option value="CE">Compte Épargne</option>
             </select>
@@ -51,12 +57,12 @@
               (focusout)="onKeyUp($event)"
               (keydown.enter)="$event.preventDefault(); onKeyUp($event)"
               placeholder="Ex: CC-100-200"
-              class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-4 text-base font-medium focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all placeholder-slate-500"
+              class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-4 text-base font-medium focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed"
               [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.numCompte?.errors}">
           </div>
         </div>
 
-        <div *ngIf="showDetails && compte"
+        <div *ngIf="showDetails && compte && compte.client"
           class="bg-slate-50 border-2 border-slate-200 rounded-xl p-8 space-y-6 animate-fade-in">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
@@ -112,17 +118,23 @@
         </div>
 
         <div *ngIf="showDetails && compte" class="pt-4">
-          <button [disabled]="opForm.invalid" type="submit"
-            class="w-full btn-primary bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed py-4 text-lg font-bold transition-all">
-            <span class="flex items-center justify-center gap-3">
+          <button [disabled]="opForm.invalid || isLoading" type="submit"
+            class="w-full btn-primary bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed py-4 text-lg font-bold transition-all flex items-center justify-center gap-3">
+            <ng-container *ngIf="isLoading; else submitVersement">
+              <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Traitement en cours...
+            </ng-container>
+            <ng-template #submitVersement>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               Confirmer le Versement
-            </span>
+            </ng-template>
           </button>
         </div>
       </div>
     </form>
-  </div>
 </div>

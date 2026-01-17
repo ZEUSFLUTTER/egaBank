@@ -1,0 +1,280 @@
+{
+  "info": {
+    "name": "EgaBank API",
+    "description": "Collection complète des endpoints de l'API EgaBank",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Inscription Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Sow\",\n  \"prenom\": \"Kossi\",\n  \"birthday\": \"1992-03-10\",\n  \"sexe\": \"M\",\n  \"telephone\": \"+221775551234\",\n  \"email\": \"kossi.sow@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"confirmPassword\": \"SecurePass123!\",\n  \"address\": \"Dakar, Almadies\",\n  \"nationalite\": \"Sénégalaise\",\n  \"profession\": \"Développeur\",\n  \"pieceIdentite\": \"CNI\",\n  \"numeroPiece\": \"1122334455667\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/client/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "auth", "client", "register"]
+            }
+          }
+        },
+        {
+          "name": "Connexion Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kossi.sow@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/client/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "auth", "client", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gestion Clients",
+      "item": [
+        {
+          "name": "Liste des clients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients"]
+            }
+          }
+        },
+        {
+          "name": "Détails d'un client",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1"]
+            }
+          }
+        },
+        {
+          "name": "Rechercher clients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/search?keyword=kossi",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "kossi"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Activer un client",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/status?status=ACTIVE",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comptes Bancaires",
+      "item": [
+        {
+          "name": "Liste des comptes d'un client",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/comptes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "comptes"]
+            }
+          }
+        },
+        {
+          "name": "Créer un compte courant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeCompte\": 1,\n  \"balanceInitial\": 100000,\n  \"devis\": \"FCFA\",\n  \"decouvert\": 20000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/comptes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "comptes"]
+            }
+          }
+        },
+        {
+          "name": "Créer un compte épargne",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeCompte\": 2,\n  \"balanceInitial\": 200000,\n  \"devis\": \"FCFA\",\n  \"tauxInteret\": 3.0\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/comptes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "comptes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Opérations Bancaires",
+      "item": [
+        {
+          "name": "Effectuer un dépôt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numCompte\": \"CMEG A1.2 8895 1140 0271 e\",\n  \"amount\": 50000,\n  \"typeOperation\": \"DEPOT\",\n  \"description\": \"Dépôt en espèces\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/operations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "operations"]
+            }
+          }
+        },
+        {
+          "name": "Effectuer un retrait",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numCompte\": \"CMEG A1.2 8895 1140 0271 e\",\n  \"amount\": 30000,\n  \"typeOperation\": \"RETRAIT\",\n  \"description\": \"Retrait DAB\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/operations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "operations"]
+            }
+          }
+        },
+        {
+          "name": "Effectuer un virement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numCompte\": \"CMEG A1.2 8895 1140 0271 e\",\n  \"amount\": 25000,\n  \"typeOperation\": \"VIREMENT\",\n  \"numCompteDestinataire\": \"CMEG A7.7 7611 7698 4732 7\",\n  \"description\": \"Virement à un ami\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/operations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "operations"]
+            }
+          }
+        },
+        {
+          "name": "Historique des opérations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/clients/1/operations/compte/CMEG A1.2 8895 1140 0271 e",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "clients", "1", "operations", "compte", "CMEG A1.2 8895 1140 0271 e"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

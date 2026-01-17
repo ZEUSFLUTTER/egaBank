@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Operation } from '../../../../../core/models/operation';
-import { Operation as OperationService } from '../../../../../core/services/operation.service';
+import { Operation, TypeOperation } from '../../../../../core/models/operation';
+import { OperationService } from '../../../../../core/services/operation.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
 import jsPDF from 'jspdf';
@@ -87,6 +87,11 @@ export class Historique implements OnInit, OnDestroy {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 
+  isCredit(op: Operation): boolean {
+    // Map "credit" visualization to known credit-like operations
+    return op.typeOperation === TypeOperation.DEPOT || op.typeOperation === TypeOperation.INTERET;
+  }
+
   downloadPDF() {
   const doc = new jsPDF();
   const numCompte = this.searchForm.value.numCompte;
@@ -104,7 +109,7 @@ export class Historique implements OnInit, OnDestroy {
     new Date(op.dateOperation).toLocaleDateString('fr-FR'),
     String(op.typeOperation),
     String(op.numOperation),
-    `${op.typeOperation === 'CREDIT' ? '+' : '-'} ${this.formatAmount(op.amount)} FCFA`
+    `${op.typeOperation === TypeOperation.DEPOT ? '+' : '-'} ${this.formatAmount(op.amount)} FCFA`
   ]);
 
   autoTable(doc, {

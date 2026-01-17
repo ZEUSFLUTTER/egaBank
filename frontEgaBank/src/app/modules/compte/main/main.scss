@@ -1,7 +1,7 @@
 /* Styles spécifiques pour le composant main du module compte */
 
 /* Héritage des styles du module opération avec adaptations */
-@import '../../operation/main/main.scss';
+@use '../../operation/main/main.scss';
 
 /* Styles spécifiques au module compte */
 .account-section {

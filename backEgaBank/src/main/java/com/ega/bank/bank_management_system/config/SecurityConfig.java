@@ -23,14 +23,14 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // On désactive les sessions pour éviter les 401 sur les API
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/dashboard/**").permitAll()
-                .requestMatchers("/api/v1/clients/**").permitAll() // Autorise l'accès aux clients
+                .requestMatchers("/api/v1/clients/**").permitAll()
                 .requestMatchers("/api/v1/comptes/**").permitAll()
-                .requestMatchers("/api/v1/operations/**").permitAll() // Autorise l'accès aux comptes
+                .requestMatchers("/api/v1/operations/**").permitAll()
                 .anyRequest().authenticated()
             );
 
@@ -46,7 +46,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

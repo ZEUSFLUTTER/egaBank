@@ -1,6 +1,6 @@
-<div class="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-8">
-  
-  <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6">
+<div class="space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
         </div>
       </form>
       <button *ngIf="ops.length > 0" (click)="downloadPDF()"
-        class="btn-primary bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 px-4 py-3 flex items-center gap-2">
+        class="btn-primary bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 px-4 py-3 flex items-center gap-2 rounded-lg font-semibold text-white">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
@@ -34,43 +34,45 @@
     </div>
   </div>
 
-  <div *ngIf="ops.length > 0; else emptyState" class="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
+  <!-- Content Section -->
+  <div *ngIf="ops.length > 0; else emptyState" class="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
     <div *ngFor="let op of ops"
-         class="flex items-center gap-6 p-6 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:shadow-md transition-all duration-200 animate-fade-in">
+         class="flex items-center gap-6 p-5 rounded-lg bg-gradient-to-r from-slate-50 to-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 animate-fade-in">
 
-      <div [class]="op.typeOperation === 'CREDIT' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'"
-           class="w-14 h-14 rounded-xl flex items-center justify-center border-2 font-bold text-xl shadow-sm">
-        <svg *ngIf="op.typeOperation === 'CREDIT'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div [class]="isCredit(op) ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'"
+           class="w-12 h-12 rounded-lg flex items-center justify-center border-2 font-bold text-lg shadow-sm flex-shrink-0">
+        <svg *ngIf="isCredit(op)" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
-        <svg *ngIf="op.typeOperation === 'DEBIT'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg *ngIf="!isCredit(op)" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path>
         </svg>
       </div>
 
-      <div class="flex-1">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xl font-bold text-slate-900 mb-1">{{ op.amount | number:'1.0-0' }} FCFA</p>
-            <p class="text-sm font-medium text-slate-600">
-              <span class="font-bold">REF:</span> {{op.numOperation}}
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-start gap-4 flex-wrap">
+          <div class="min-w-0">
+            <p class="text-lg font-bold text-slate-900">{{ op.amount | number:'1.0-0' }} FCFA</p>
+            <p class="text-sm text-slate-600 mt-1">
+              <span class="font-semibold">REF:</span> {{op.numOperation}}
             </p>
-            <span [class]="op.typeOperation === 'CREDIT' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border mt-2">
-              {{op.typeOperation === 'CREDIT' ? 'Crédit' : 'Débit'}}
+            <span [class]="isCredit(op) ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border mt-2">
+              {{ isCredit(op) ? 'Crédit' : 'Débit' }}
             </span>
           </div>
           <div class="text-right">
-            <p class="text-lg font-bold text-slate-700">{{op.dateOperation | date:'HH:mm'}}</p>
-            <p class="text-sm font-medium text-slate-500">{{op.dateOperation | date:'dd MMM yyyy'}}</p>
+            <p class="text-base font-bold text-slate-700">{{op.dateOperation | date:'HH:mm'}}</p>
+            <p class="text-sm text-slate-500">{{op.dateOperation | date:'dd MMM yyyy'}}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Empty State -->
   <ng-template #emptyState>
-    <div class="py-16 text-center border-2 border-dashed border-slate-300 rounded-xl bg-slate-50">
+    <div class="py-20 text-center border-2 border-dashed border-slate-300 rounded-xl bg-gradient-to-b from-slate-50 to-slate-100">
       <div class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
         <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

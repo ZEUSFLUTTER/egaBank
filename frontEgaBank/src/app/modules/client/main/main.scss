@@ -1,7 +1,7 @@
 /* Styles spécifiques pour le composant main du module client */
 
 /* Héritage des styles communs */
-@import '../../operation/main/main.scss';
+@use '../../operation/main/main.scss';
 
 /* Styles spécifiques au module client */
 .client-section {

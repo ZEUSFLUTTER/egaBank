@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
-import { Operation } from '../../../../../core/models/operation';
-import { Operation as OperationService } from '../../../../../core/services/operation.service';
+import { OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
@@ -18,6 +17,7 @@ import { Subscription } from 'rxjs';
 export class Retrait implements OnInit, OnDestroy {
   public opForm!: FormGroup;
   public submitted = false;
+  public isLoading = false;
   compte!: Compte;
   public showDetails: boolean = false;
 
@@ -30,7 +30,8 @@ export class Retrait implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private compteService: CompteService,
     private operationService: OperationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -52,9 +53,12 @@ export class Retrait implements OnInit, OnDestroy {
   onSubmit() {
     this.submitted = true;
 
-    if (this.opForm.invalid) {
+    if (this.opForm.invalid || this.isLoading) {
       return;
     }
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
     const operationData = {
       numCompteSource: this.fb.numCompte.value,
@@ -62,19 +66,21 @@ export class Retrait implements OnInit, OnDestroy {
       type: 'RETRAIT'
     };
 
-    this.operationService.effectuerRetrait(<Operation>{
+    this.operationService.effectuerRetrait({
       numCompteSource: this.fb.numCompte.value,
       amount: this.fb.montant.value
     }).subscribe({
       next: (data: any) => {
         this.isError = '';
         this.isSuccessed = true;
+        this.isLoading = false;
         this.opForm.reset();
         this.submitted = false;
         this.showDetails = false;
+        this.cdr.detectChanges();
 
-        // 🔄 NOTIFICATION EN TEMPS RÉEL
-        this.notificationService.notifyOperationSuccess('Retrait', {
+        // ✅ Notification de succès
+        this.notificationService.notifyOperationSuccess('Retrait effectué avec succès', {
           ...operationData,
           compte: this.compte
         });
@@ -91,6 +97,13 @@ export class Retrait implements OnInit, OnDestroy {
       error: (err: any) => {
         this.isError = err.error?.message || "Erreur lors du retrait";
         this.isSuccessed = false;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        this.notificationService.sendNotification({
+          type: 'operation',
+          action: 'create',
+          message: this.isError
+        });
       }
     });
   }

@@ -24,7 +24,7 @@ export class FormCompte implements OnInit, OnChanges {
   public isEpargne: boolean = false;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private compteService: CompteService,
     private notificationService: NotificationService
   ) { }
@@ -48,11 +48,11 @@ export class FormCompte implements OnInit, OnChanges {
 
   private initForm() {
     this.compteForm = this.fb.group({
-      clientId: [this.clientId],
-      name: [this.clientName],
-      dt: ['', [Validators.required, Validators.min(0)]],
-      balance: ['', [Validators.required, Validators.min(0)]],
-      type: ['', [Validators.required]]
+      clientId: [{value: this.clientId, disabled: false}],
+      name: [{value: this.clientName, disabled: false}],
+      dt: [{value: '', disabled: false}, [Validators.required, Validators.min(0)]],
+      balance: [{value: '', disabled: false}, [Validators.required, Validators.min(0)]],
+      type: [{value: '', disabled: false}, [Validators.required]]
     });
 
     this.compteForm.get('type')?.valueChanges.subscribe(val => {
@@ -67,11 +67,11 @@ export class FormCompte implements OnInit, OnChanges {
     if (this.compteForm.invalid) return;
 
     const payload = {
-      decouvert: this.isCourant ? Number(this.compteForm.value.dt) : 0,
-      tauxInteret: this.isEpargne ? Number(this.compteForm.value.dt) : 0,
-      balance: Number(this.compteForm.value.balance),
+      decouvert: this.isCourant ? Number(this.compteForm.getRawValue().dt) : 0,
+      tauxInteret: this.isEpargne ? Number(this.compteForm.getRawValue().dt) : 0,
+      balance: Number(this.compteForm.getRawValue().balance),
       clientId: Number(this.clientId),
-      type: this.compteForm.value.type
+      type: this.compteForm.getRawValue().type
     };
 
     this.compteService.postCompte(payload as any).subscribe({
@@ -79,14 +79,14 @@ export class FormCompte implements OnInit, OnChanges {
         this.isSuccessed = true;
         this.compteForm.disable();
         console.log("Compte créé !", data);
-        
+
         // 🔄 NOTIFICATION EN TEMPS RÉEL - Nouveau compte créé
         this.notificationService.notifyCompteUpdate({
           ...payload,
           numCompte: data?.numCompte || 'nouveau',
           action: 'create'
         });
-        
+
         // Forcer le rafraîchissement de la liste des comptes
         this.notificationService.forceRefresh('comptes');
       },

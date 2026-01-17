@@ -1,8 +1,9 @@
-<div class="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-8">
+<div class="space-y-6">
 
+  <!-- Success Message -->
   <div *ngIf="isSuccessed"
-    class="mb-8 p-6 bg-emerald-50 border-2 border-emerald-200 rounded-xl flex items-center gap-4 text-emerald-800 animate-fade-in">
-    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center shadow-md">
+    class="p-6 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-4 text-emerald-800 animate-fade-in">
+    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
       </svg>
@@ -13,67 +14,78 @@
     </div>
   </div>
 
-  <div class="mb-8">
-    <div class="flex items-center gap-4 mb-4">
-      <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
-        <svg *ngIf="!showCompteForm" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
-        <svg *ngIf="showCompteForm" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+  <!-- Header -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+          <svg *ngIf="!showCompteForm" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          <svg *ngIf="showCompteForm" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 font-playfair">
+            <span *ngIf="!showCompteForm">Inscription Client</span>
+            <span *ngIf="showCompteForm">Ouverture de Compte</span>
+          </h2>
+          <p class="text-slate-600 font-medium">EgaBank Cloud Services</p>
+        </div>
       </div>
-      <div>
-        <h2 class="text-2xl font-bold text-slate-900 font-playfair">
-          <span *ngIf="!showCompteForm">Inscription Client</span>
-          <span *ngIf="showCompteForm">Ouverture de Compte</span>
-        </h2>
-        <p class="text-slate-600 font-medium">EgaBank Cloud Services</p>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="flex items-center gap-2">
+        <div class="w-4 h-4 border-2 border-blue-500 border-t-blue-200 rounded-full animate-spin"></div>
+        <span class="text-sm font-semibold text-blue-700">Traitement...</span>
       </div>
     </div>
   </div>
 
-  <form *ngIf="!showCompteForm" [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <!-- Client Form -->
+  <form *ngIf="!showCompteForm" [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="space-y-6 bg-white p-6 rounded-lg border border-slate-200">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
       <div class="space-y-2">
         <label class="block text-slate-800 text-sm font-bold">Nom de famille *</label>
-        <input type="text" formControlName="firstName" placeholder="SESSOU"
-          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.firstName.errors}"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500">
-        <small *ngIf="submitted && fb.firstName.errors" class="text-red-600 text-sm font-medium">Ce champ est requis</small>
+        <input type="text" formControlName="nom" placeholder="SESSOU"
+          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.nom.errors}"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed">
+        <small *ngIf="submitted && fb.nom.errors" class="text-red-600 text-sm font-medium">Ce champ est requis (2-50 caractères)</small>
       </div>
 
       <div class="space-y-2">
-        <label class="block text-slate-800 text-sm font-bold">Prénoms</label>
-        <input type="text" formControlName="lastName" placeholder="Jean-Luc"
-          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.lastName.errors}"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500">
+        <label class="block text-slate-800 text-sm font-bold">Prénoms *</label>
+        <input type="text" formControlName="prenom" placeholder="Jean-Luc"
+          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.prenom.errors}"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed">
+        <small *ngIf="submitted && fb.prenom.errors" class="text-red-600 text-sm font-medium">Ce champ est requis (2-50 caractères)</small>
       </div>
 
       <div class="space-y-2 md:col-span-2">
         <label class="block text-slate-800 text-sm font-bold">Adresse Email</label>
         <input type="email" formControlName="email" placeholder="client@egabank.com"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500">
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed">
       </div>
 
       <div class="space-y-2">
         <label class="block text-slate-800 text-sm font-bold">Téléphone</label>
         <input type="text" formControlName="telephone" placeholder="+228 90 00 00 00"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500">
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed">
       </div>
 
       <div class="space-y-2">
         <label class="block text-slate-800 text-sm font-bold">Date de naissance</label>
         <input type="date" formControlName="birthday"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
       </div>
 
       <div class="space-y-2">
         <label class="block text-slate-800 text-sm font-bold">Sexe</label>
         <select formControlName="sexe"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-          <option value="" disabled selected>Choisir le genre...</option>
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+          <option value="" disabled>Choisir le genre...</option>
           <option value="M">Masculin</option>
           <option value="F">Féminin</option>
         </select>
@@ -82,28 +94,62 @@
       <div class="space-y-2">
         <label class="block text-slate-800 text-sm font-bold">Nationalité</label>
         <input type="text" formControlName="nationalite" placeholder="Togolaise"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500">
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed">
       </div>
 
       <div class="space-y-2 md:col-span-2">
         <label class="block text-slate-800 text-sm font-bold">Adresse Résidentielle</label>
         <textarea formControlName="address" rows="3" placeholder="Lomé, Togo (Quartier, Rue, Maison)"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all resize-none placeholder-slate-500"></textarea>
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all resize-none placeholder-slate-500 disabled:opacity-60 disabled:cursor-not-allowed"></textarea>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-800 text-sm font-bold">Mot de passe *</label>
+        <input type="password" formControlName="password" placeholder="Min. 8 caractères"
+          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && fb.password.errors}"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+        <small *ngIf="submitted && fb.password.errors" class="text-red-600 text-sm font-medium">Min. 8 caractères</small>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-800 text-sm font-bold">Confirmer le mot de passe *</label>
+        <input type="password" formControlName="confirmPassword" placeholder="Confirmer le mot de passe"
+          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-100': submitted && (fb.confirmPassword.errors || customerForm.hasError('passwordMismatch'))}"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+        <small *ngIf="submitted && customerForm.hasError('passwordMismatch')" class="text-red-600 text-sm font-medium">Les mots de passe ne correspondent pas</small>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-800 text-sm font-bold">Profession</label>
+        <input type="text" formControlName="profession" placeholder="Votre profession"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-800 text-sm font-bold">Type de pièce d'identité</label>
+        <input type="text" formControlName="pieceIdentite" placeholder="Passeport, Carte d'identité, etc."
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-800 text-sm font-bold">Numéro de pièce d'identité</label>
+        <input type="text" formControlName="numeroPiece" placeholder="Numéro de la pièce d'identité"
+          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
       </div>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t-2 border-slate-200">
-      <button type="submit" [disabled]="customerForm.invalid || submitted"
+      <button type="submit" [disabled]="customerForm.invalid || submitted || isLoading"
         class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed py-4 text-lg font-bold transition-all flex items-center justify-center gap-3">
 
-        <ng-container *ngIf="submitted && !isSuccessed; else defaultBtn">
+        <ng-container *ngIf="isLoading; else submitBtn">
           <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           Traitement en cours...
         </ng-container>
-        <ng-template #defaultBtn>
+        <ng-template #submitBtn>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -111,13 +157,14 @@
         </ng-template>
       </button>
 
-      <button type="reset"
-        class="btn-secondary px-8 py-4 text-lg font-medium">
+      <button type="reset" [disabled]="isLoading"
+        class="btn-secondary px-8 py-4 text-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
         Réinitialiser
       </button>
     </div>
   </form>
 
+  <!-- Compte Form -->
   <div *ngIf="showCompteForm" class="animate-fade-in">
     <app-form-compte [clientName]="name" [clientId]="idClient"></app-form-compte>
   </div>

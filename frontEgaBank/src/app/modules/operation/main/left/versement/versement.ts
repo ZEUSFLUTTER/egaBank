@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
-import { Operation } from '../../../../../core/models/operation';
-import { Operation as OperationService } from '../../../../../core/services/operation.service';
+import { OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
@@ -18,6 +17,7 @@ import { Subscription } from 'rxjs';
 export class Versement implements OnInit, OnDestroy {
   public opForm!: FormGroup;
   public submitted = false;
+  public isLoading = false;
   compte!: Compte;
   public showDetails: boolean = false;
 
@@ -30,19 +30,33 @@ export class Versement implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private compteService: CompteService,
     private operationService: OperationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.opForm = this.formBuilder.group({
       montant: ['', [Validators.required, Validators.min(1)]],
-      numCompte: ['', [Validators.required]],
-      type: ['']
+      numCompte: [{value: '', disabled: false}, [Validators.required]],
+      type: [{value: '', disabled: false}]
     });
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private updateFormDisabledState(): void {
+    const typeControl = this.opForm.get('type');
+    const numCompteControl = this.opForm.get('numCompte');
+
+    if (this.isLoading) {
+      typeControl?.disable({emitEvent: false});
+      numCompteControl?.disable({emitEvent: false});
+    } else {
+      typeControl?.enable({emitEvent: false});
+      numCompteControl?.enable({emitEvent: false});
+    }
   }
 
   get fb(): any {
@@ -52,9 +66,12 @@ export class Versement implements OnInit, OnDestroy {
   onSubmit() {
     this.submitted = true;
 
-    if (this.opForm.invalid) {
+    if (this.opForm.invalid || this.isLoading) {
       return;
     }
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
     const operationData = {
       numCompteSource: this.fb.numCompte.value,
@@ -62,19 +79,21 @@ export class Versement implements OnInit, OnDestroy {
       type: 'VERSEMENT'
     };
 
-    this.operationService.effectuerVersement(<Operation>{
+    this.operationService.effectuerVersement({
       numCompteSource: this.fb.numCompte.value,
       amount: this.fb.montant.value
     }).subscribe({
       next: (data: any) => {
         this.isError = '';
         this.isSuccessed = true;
+        this.isLoading = false;
         this.opForm.reset();
         this.submitted = false;
         this.showDetails = false;
+        this.cdr.detectChanges();
 
-        // 🔄 NOTIFICATION EN TEMPS RÉEL
-        this.notificationService.notifyOperationSuccess('Versement', {
+        // ✅ Notification de succès
+        this.notificationService.notifyOperationSuccess('Versement effectué avec succès', {
           ...operationData,
           compte: this.compte
         });
@@ -91,6 +110,13 @@ export class Versement implements OnInit, OnDestroy {
       error: (err: any) => {
         this.isError = err.error?.message || "Erreur lors de l'opération";
         this.isSuccessed = false;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        this.notificationService.sendNotification({
+          type: 'operation',
+          action: 'create',
+          message: this.isError
+        });
       }
     });
   }

@@ -4,6 +4,7 @@ import { Client } from '../../../../../core/models/client';
 import { ClientService } from '../../../../../core/services/client.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-show-client',
@@ -15,6 +16,7 @@ import { Subscription } from 'rxjs';
 export class ShowClient implements OnInit, OnDestroy {
 
   clients: Client[] = [];
+  isLoading = false;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -33,10 +35,12 @@ export class ShowClient implements OnInit, OnDestroy {
   }
 
   private setupNotificationSubscriptions(): void {
-    // Écouter les notifications de clients
-    const clientSub = this.notificationService.clientUpdate$.subscribe(() => {
-      this.onGetClients();
-    });
+    // Écouter les notifications de clients avec debounce pour éviter les appels multiples
+    const clientSub = this.notificationService.clientUpdate$
+      .pipe(debounceTime(300))
+      .subscribe(() => {
+        this.onGetClients();
+      });
 
     // Écouter les rafraîchissements forcés
     const refreshSub = this.notificationService.refresh$.subscribe((component) => {
@@ -49,19 +53,48 @@ export class ShowClient implements OnInit, OnDestroy {
   }
 
   onGetClients(): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
     this.clientService.getClients().subscribe({
       next: (data: Client[]) => {
         console.log('Données reçues du service:', data);
         this.clients = data;
+        this.isLoading = false;
 
         // FORCE Angular à voir le changement et à afficher le tableau immédiatement
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur lors de la récupération des clients : ', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       complete: () => {
         console.log('Récupération terminée');
+      }
+    });
+  }
+
+  approve(client: Client): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.clientService.activateClient(client.id).subscribe({
+      next: () => {
+        this.notificationService.notifyOperationSuccess('Client validé avec succès');
+        // Rafraîchir immédiatement
+        setTimeout(() => this.onGetClients(), 300);
+      },
+      error: (err: any) => {
+        console.error('Erreur lors de la validation du client:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        this.notificationService.sendNotification({
+          type: 'client',
+          action: 'update',
+          message: 'Erreur lors de la validation du client'
+        });
       }
     });
   }

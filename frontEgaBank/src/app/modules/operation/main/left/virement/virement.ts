@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CompteService } from '../../../../../core/services/compte.service';
-import { Operation } from '../../../../../core/models/operation';
-import { Operation as OperationService } from '../../../../../core/services/operation.service';
+import { OperationService } from '../../../../../core/services/operation.service';
 import { Compte } from '../../../../../core/models/comptes';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
@@ -69,7 +68,7 @@ export class Virement implements OnInit, OnDestroy {
       type: 'VIREMENT'
     };
 
-    this.operationService.effectuerVirement(<Operation>{
+    this.operationService.effectuerVirement({
       numCompteSource: this.fb.numCompteS.value,
       numCompteDestination: this.fb.numCompteD.value,
       amount: this.fb.montant.value

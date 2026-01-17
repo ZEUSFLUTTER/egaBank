@@ -7,7 +7,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-left',
-  imports: [Versement, Retrait, Virement,CommonModule],
+  standalone: true,
+  imports: [Versement, Retrait, Virement, CommonModule],
   templateUrl: './left.html',
   styleUrl: './left.scss',
 })

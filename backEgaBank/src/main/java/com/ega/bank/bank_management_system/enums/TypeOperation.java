@@ -1,7 +1,10 @@
 package com.ega.bank.bank_management_system.enums;
 
 public enum TypeOperation {
-    CREDIT,
-    DEBIT
-
+    DEPOT,           // Dépôt
+    RETRAIT,         // Retrait
+    VIREMENT,        // Virement
+    PAIEMENT,        // Paiement
+    FRAIS,           // Frais bancaires
+    INTERET          // Intérêts
 }

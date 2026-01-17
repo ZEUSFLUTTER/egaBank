@@ -1,15 +1,15 @@
 package com.ega.bank.bank_management_system.servives;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ega.bank.bank_management_system.dto.CompteDto;
+import com.ega.bank.bank_management_system.dto.CreateCompteDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.entities.CompteBancaire;
 import com.ega.bank.bank_management_system.entities.CompteCourant;
@@ -18,48 +18,69 @@ import com.ega.bank.bank_management_system.enums.AccountStatus;
 import com.ega.bank.bank_management_system.repositories.ClientRepository;
 import com.ega.bank.bank_management_system.repositories.CompteBancaireRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CompteServiceImpl implements CompteService {
 
     private final CompteBancaireRepository compteBancaireRepository;
     private final ClientRepository clientRepository;
 
-    public CompteServiceImpl(
-            final CompteBancaireRepository compteBancaireRepository,
-            final ClientRepository clientRepository
-    ) {
-        this.clientRepository = clientRepository;
-        this.compteBancaireRepository = compteBancaireRepository;
-    }
-
     @Override
     public CompteBancaire createAccount(CompteDto compteDto) {
-        Optional<Client> clientOpt = this.clientRepository.findById(compteDto.getClientId());
-
-        if (clientOpt.isEmpty()) {
-            throw new RuntimeException("Client non trouvé");
-        }
+        Client client = clientRepository.findById(compteDto.getClientId())
+            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
 
         if (compteDto.getDecouvert() > 0) {
             CompteCourant cc = new CompteCourant();
             cc.setCreatedAt(new Date());
             cc.setBalance(compteDto.getBalance());
             cc.setDecouvert(compteDto.getDecouvert());
-            cc.setClient(clientOpt.get());
+            cc.setClient(client);
             cc.setStatus(AccountStatus.ACTIVATED);
-            cc.setNumCompte(generateAccountNumber());
-            return this.compteBancaireRepository.save(cc); 
+            cc.setNumCompte(generateNumeroCompte());
+            return compteBancaireRepository.save(cc);
         } else {
             CompteEpargne ce = new CompteEpargne();
             ce.setCreatedAt(new Date());
             ce.setBalance(compteDto.getBalance());
             ce.setTauxInteret(compteDto.getTauxInteret());
-            ce.setClient(clientOpt.get());
+            ce.setClient(client);
             ce.setStatus(AccountStatus.ACTIVATED);
-            ce.setNumCompte(generateAccountNumber());
-            return this.compteBancaireRepository.save(ce); 
+            ce.setNumCompte(generateNumeroCompte());
+            return compteBancaireRepository.save(ce);
         }
+    }
+
+    @Override
+    public CompteBancaire createAccountForClient(Long clientId, CreateCompteDto createCompteDto) {
+        Client client = clientRepository.findById(clientId)
+            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+
+        CompteBancaire compte;
+        
+        if (createCompteDto.getTypeCompte() == 1) {
+            CompteCourant cc = new CompteCourant();
+            cc.setDecouvert(createCompteDto.getDecouvert() != null ? createCompteDto.getDecouvert() : 0.0);
+            compte = cc;
+        } else if (createCompteDto.getTypeCompte() == 2) {
+            CompteEpargne ce = new CompteEpargne();
+            ce.setTauxInteret(createCompteDto.getTauxInteret() != null ? createCompteDto.getTauxInteret() : 0.0);
+            compte = ce;
+        } else {
+            throw new RuntimeException("Type de compte invalide");
+        }
+
+        compte.setNumCompte(generateNumeroCompte());
+        compte.setBalance(createCompteDto.getBalanceInitial());
+        compte.setDevis(createCompteDto.getDevis());
+        compte.setClient(client);
+        compte.setStatus(AccountStatus.ACTIVATED);
+        compte.setCreatedAt(new Date());
+
+        return compteBancaireRepository.save(compte);
     }
 
     @Override
@@ -85,49 +106,75 @@ public class CompteServiceImpl implements CompteService {
     }
 
     @Override
-    public boolean activeCompte(String numCompte) {
-        Optional<CompteBancaire> compte = this.compteBancaireRepository.findByNumCompte(numCompte);
-        if (compte.isPresent() && compte.get().getStatus().equals(AccountStatus.SUSPENDED)) {
-            CompteBancaire c = compte.get();
-            c.setStatus(AccountStatus.ACTIVATED);
-            this.compteBancaireRepository.save(c);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean suspendCompte(String numCompte) {
-        Optional<CompteBancaire> compte = this.compteBancaireRepository.findByNumCompte(numCompte);
-        if (compte.isPresent() && compte.get().getStatus().equals(AccountStatus.ACTIVATED)) {
-            CompteBancaire c = compte.get();
-            c.setStatus(AccountStatus.SUSPENDED);
-            this.compteBancaireRepository.save(c);
-            return true;
-        } else {
-            return false;
-        }
+    public List<CompteBancaire> findComptesByClientId(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+        return new ArrayList<>(client.getComptes());
     }
 
     @Override
     public CompteBancaire findOne(String numCompte) {
-        return this.compteBancaireRepository.findByNumCompte(numCompte).orElse(null);
+        return compteBancaireRepository.findByNumCompte(numCompte)
+            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
     }
 
-    private static String generateAccountNumber() {
+    @Override
+    public CompteBancaire findById(Long id) {
+        return compteBancaireRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+    }
+
+    @Override
+    public boolean activeCompte(String numCompte) {
+        CompteBancaire compte = compteBancaireRepository.findByNumCompte(numCompte)
+            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+        
+        if (compte.getStatus() == AccountStatus.SUSPENDED) {
+            compte.setStatus(AccountStatus.ACTIVATED);
+            compteBancaireRepository.save(compte);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean suspendCompte(String numCompte) {
+        CompteBancaire compte = compteBancaireRepository.findByNumCompte(numCompte)
+            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+        
+        if (compte.getStatus() == AccountStatus.ACTIVATED) {
+            compte.setStatus(AccountStatus.SUSPENDED);
+            compteBancaireRepository.save(compte);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteCompte(String numCompte) {
+        CompteBancaire compte = findOne(numCompte);
+        compteBancaireRepository.delete(compte);
+    }
+
+    @Override
+    public String generateNumeroCompte() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
-
+        
+        // Format: CMEG A1.2 8895 1140 0271 e
+        sb.append("CMEG ");
+        sb.append("A").append(random.nextInt(10)).append(".");
+        sb.append(random.nextInt(10)).append(" ");
+        
         for (int i = 0; i < 4; i++) {
-            sb.append("0");
+            if (i > 0) sb.append(" ");
+            for (int j = 0; j < 4; j++) {
+                sb.append(random.nextInt(10));
+            }
         }
-        for (int i = 0; i < 4; i++) {
-            sb.append(random.nextInt(2));
-        }
-        for (int i = 0; i < 10; i++) {
-            sb.append(random.nextInt(10));
-        }
+        
+        sb.append(" e");
+        
         return sb.toString();
     }
 }
