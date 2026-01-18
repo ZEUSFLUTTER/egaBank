@@ -32,10 +32,7 @@ export class RegisterComponent {
       password: [{value: '', disabled: false}, [Validators.required, Validators.minLength(8)]],
       confirmPassword: [{value: '', disabled: false}, Validators.required],
       address: [{value: '', disabled: false}, Validators.required],
-      nationalite: [{value: '', disabled: false}, Validators.required],
-      profession: [{value: '', disabled: false}],
-      pieceIdentite: [{value: '', disabled: false}],
-      numeroPiece: [{value: '', disabled: false}]
+      nationalite: [{value: '', disabled: false}, Validators.required]
     }, { validators: this.passwordMatchValidator });
   }
 

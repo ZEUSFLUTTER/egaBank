@@ -84,15 +84,6 @@ public class Client implements Serializable{
     @Column(length = 50)
     private String nationalite;
     
-    @Column(length = 50)
-    private String profession;
-    
-    @Column(length = 50)
-    private String pieceIdentite;
-    
-    @Column(length = 50)
-    private String numeroPiece;
-    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ClientStatus status = ClientStatus.PENDING;

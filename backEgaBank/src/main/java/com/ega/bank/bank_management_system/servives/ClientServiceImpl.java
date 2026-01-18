@@ -11,6 +11,7 @@ import com.ega.bank.bank_management_system.dto.ClientDto;
 import com.ega.bank.bank_management_system.dto.LoginRequestDto;
 import com.ega.bank.bank_management_system.dto.LoginResponseDto;
 import com.ega.bank.bank_management_system.dto.RegisterClientDto;
+import com.ega.bank.bank_management_system.dto.UpdateClientDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.enums.ClientStatus;
 import com.ega.bank.bank_management_system.repositories.ClientRepository;
@@ -67,9 +68,6 @@ public class ClientServiceImpl implements ClientService {
         client.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         client.setAddress(registerDto.getAddress());
         client.setNationalite(registerDto.getNationalite());
-        client.setProfession(registerDto.getProfession());
-        client.setPieceIdentite(registerDto.getPieceIdentite());
-        client.setNumeroPiece(registerDto.getNumeroPiece());
         client.setStatus(ClientStatus.PENDING);
         
         return clientRepository.save(client);
@@ -115,6 +113,39 @@ public class ClientServiceImpl implements ClientService {
         client.setTelephone(clientDto.getTelephone());
         client.setAddress(clientDto.getAddress());
         client.setNationalite(clientDto.getNationalite());
+        
+        return clientRepository.save(client);
+    }
+
+    @Override
+    public Client partialUpdateClient(Long id, UpdateClientDto updateDto) {
+        Client client = findOne(id);
+        
+        // Mettre à jour uniquement les champs non nuls
+        if (updateDto.getNom() != null) {
+            client.setNom(updateDto.getNom());
+        }
+        if (updateDto.getPrenom() != null) {
+            client.setPrenom(updateDto.getPrenom());
+        }
+        if (updateDto.getBirthday() != null) {
+            client.setBirthday(updateDto.getBirthday());
+        }
+        if (updateDto.getSexe() != null) {
+            client.setSexe(updateDto.getSexe());
+        }
+        if (updateDto.getTelephone() != null) {
+            client.setTelephone(updateDto.getTelephone());
+        }
+        if (updateDto.getEmail() != null) {
+            client.setEmail(updateDto.getEmail());
+        }
+        if (updateDto.getAddress() != null) {
+            client.setAddress(updateDto.getAddress());
+        }
+        if (updateDto.getNationalite() != null) {
+            client.setNationalite(updateDto.getNationalite());
+        }
         
         return clientRepository.save(client);
     }

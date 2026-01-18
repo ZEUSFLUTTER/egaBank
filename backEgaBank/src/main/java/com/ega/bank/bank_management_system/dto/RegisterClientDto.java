@@ -48,7 +48,4 @@ public class RegisterClientDto {
     
     private String address;
     private String nationalite;
-    private String profession;
-    private String pieceIdentite;
-    private String numeroPiece;
 }

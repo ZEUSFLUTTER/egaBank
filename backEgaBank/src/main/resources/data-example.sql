@@ -3,11 +3,11 @@
 
 -- Insertion d'un client de test (mot de passe: Password123!)
 -- Le mot de passe est hashé avec BCrypt
-INSERT INTO client (id, nom, prenom, birthday, sexe, telephone, email, password, address, nationalite, profession, piece_identite, numero_piece, status, email_verified, phone_verified, created_at, updated_at)
-VALUES (1, 'Diop', 'Amadou', '1990-05-15', 'M', '+221771234567', 'amadou.diop@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhCu', 'Dakar, Plateau', 'Sénégalaise', 'Ingénieur', 'CNI', '1234567890123', 'ACTIVE', true, true, NOW(), NOW());
+INSERT INTO client (id, nom, prenom, birthday, sexe, telephone, email, password, address, nationalite, status, email_verified, phone_verified, created_at, updated_at)
+VALUES (1, 'Diop', 'Amadou', '1990-05-15', 'M', '+221771234567', 'amadou.diop@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhCu', 'Dakar, Plateau', 'Sénégalaise', 'ACTIVE', true, true, NOW(), NOW());
 
-INSERT INTO client (id, nom, prenom, birthday, sexe, telephone, email, password, address, nationalite, profession, piece_identite, numero_piece, status, email_verified, phone_verified, created_at, updated_at)
-VALUES (2, 'Ndiaye', 'Fatou', '1995-08-20', 'F', '+221779876543', 'fatou.ndiaye@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhCu', 'Thiès, Centre', 'Sénégalaise', 'Commerçante', 'CNI', '9876543210987', 'ACTIVE', true, true, NOW(), NOW());
+INSERT INTO client (id, nom, prenom, birthday, sexe, telephone, email, password, address, nationalite, status, email_verified, phone_verified, created_at, updated_at)
+VALUES (2, 'Ndiaye', 'Fatou', '1995-08-20', 'F', '+221779876543', 'fatou.ndiaye@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhCu', 'Thiès, Centre', 'Sénégalaise', 'ACTIVE', true, true, NOW(), NOW());
 
 -- Insertion de comptes bancaires
 -- Compte Courant pour Amadou

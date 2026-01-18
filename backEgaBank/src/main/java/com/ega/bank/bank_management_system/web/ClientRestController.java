@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ega.bank.bank_management_system.dto.ClientDto;
+import com.ega.bank.bank_management_system.dto.UpdateClientDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.enums.ClientStatus;
 import com.ega.bank.bank_management_system.servives.ClientService;
@@ -86,6 +87,18 @@ public class ClientRestController {
             @Valid @RequestBody ClientDto dto) {
         try {
             Client updated = clientService.updateClient(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Client> partialUpdateClient(
+            @PathVariable Long id,
+            @RequestBody UpdateClientDto dto) {
+        try {
+            Client updated = clientService.partialUpdateClient(id, dto);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

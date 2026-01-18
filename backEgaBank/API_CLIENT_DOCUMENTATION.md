@@ -25,10 +25,7 @@ POST /api/auth/client/register
   "password": "MotDePasse123!",
   "confirmPassword": "MotDePasse123!",
   "address": "Dakar, Sénégal",
-  "nationalite": "Sénégalaise",
-  "profession": "Ingénieur",
-  "pieceIdentite": "CNI",
-  "numeroPiece": "1234567890123"
+  "nationalite": "Sénégalaise"
 }
 ```
 

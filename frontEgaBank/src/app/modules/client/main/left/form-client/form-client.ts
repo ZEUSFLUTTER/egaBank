@@ -44,10 +44,7 @@ export class FormClient implements OnInit, OnDestroy {
       address: [{value: '', disabled: false}, Validators.required],
       nationalite: [{value: '', disabled: false}, Validators.required],
       password: [{value: '', disabled: false}, [Validators.required, Validators.minLength(8)]],
-      confirmPassword: [{value: '', disabled: false}, Validators.required],
-      profession: [{value: '', disabled: false}],
-      pieceIdentite: [{value: '', disabled: false}],
-      numeroPiece: [{value: '', disabled: false}]
+      confirmPassword: [{value: '', disabled: false}, Validators.required]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -113,10 +110,7 @@ export class FormClient implements OnInit, OnDestroy {
       address: formValue.address,
       nationalite: formValue.nationalite,
       password: formValue.password,
-      confirmPassword: formValue.confirmPassword,
-      profession: formValue.profession || undefined,
-      pieceIdentite: formValue.pieceIdentite || undefined,
-      numeroPiece: formValue.numeroPiece || undefined
+      confirmPassword: formValue.confirmPassword
     };
 
     console.log('Sending RegisterClientDto:', registerDto);

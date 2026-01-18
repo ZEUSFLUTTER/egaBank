@@ -9,9 +9,6 @@ export interface Client {
   password?: string;
   address: string;
   nationalite: string;
-  profession?: string;
-  pieceIdentite?: string;
-  numeroPiece?: string;
   status: ClientStatus;
   emailVerified: boolean;
   phoneVerified: boolean;
@@ -51,9 +48,6 @@ export interface RegisterClientDto {
   confirmPassword: string;
   address: string;
   nationalite: string;
-  profession?: string;
-  pieceIdentite?: string;
-  numeroPiece?: string;
 }
 
 export interface LoginRequestDto {

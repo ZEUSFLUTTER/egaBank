@@ -1,0 +1,124 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold">
+          {{ client ? 'Modifier le client' : 'Ajouter un client' }}
+        </h2>
+        <button (click)="onClose()" class="text-white hover:bg-white/20 rounded-lg p-2 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <form [formGroup]="clientForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Nom -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+            <input formControlName="nom" type="text" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Nom du client">
+            <div *ngIf="clientForm.get('nom')?.invalid && (clientForm.get('nom')?.touched || clientForm.get('nom')?.dirty)" 
+                 class="text-red-500 text-xs mt-1">
+              {{ getErrorMessage('nom') }}
+            </div>
+          </div>
+
+          <!-- Prénom -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+            <input formControlName="prenom" type="text" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Prénom du client">
+            <div *ngIf="clientForm.get('prenom')?.invalid && (clientForm.get('prenom')?.touched || clientForm.get('prenom')?.dirty)" 
+                 class="text-red-500 text-xs mt-1">
+              {{ getErrorMessage('prenom') }}
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+            <input formControlName="email" type="email" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="email@example.com">
+            <div *ngIf="clientForm.get('email')?.invalid && (clientForm.get('email')?.touched || clientForm.get('email')?.dirty)" 
+                 class="text-red-500 text-xs mt-1">
+              {{ getErrorMessage('email') }}
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+            <input formControlName="telephone" type="tel" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="0612345678">
+            <div *ngIf="clientForm.get('telephone')?.invalid && (clientForm.get('telephone')?.touched || clientForm.get('telephone')?.dirty)" 
+                 class="text-red-500 text-xs mt-1">
+              {{ getErrorMessage('telephone') }}
+            </div>
+          </div>
+
+          <!-- Date de naissance -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance *</label>
+            <input formControlName="birthday" type="date" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div *ngIf="clientForm.get('birthday')?.invalid && (clientForm.get('birthday')?.touched || clientForm.get('birthday')?.dirty)" 
+                 class="text-red-500 text-xs mt-1">
+              {{ getErrorMessage('birthday') }}
+            </div>
+          </div>
+
+          <!-- Sexe -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sexe *</label>
+            <select formControlName="sexe" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+            </select>
+          </div>
+
+          <!-- Statut -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Statut *</label>
+            <select formControlName="status" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option *ngFor="let status of clientStatuses" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 px-6 py-4 border-t">
+      <div class="flex justify-end space-x-3">
+        <button (click)="onClose()" 
+                class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+          Annuler
+        </button>
+        <button (click)="onSave()" 
+                [disabled]="clientForm.invalid || isLoading"
+                class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isLoading">Enregistrer</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Enregistrement...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

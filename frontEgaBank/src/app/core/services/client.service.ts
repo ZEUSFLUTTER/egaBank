@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client, ClientStatus, ClientDto } from '../models/client';
+import { UpdateClientDto } from '../models/client-dto';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({
@@ -44,9 +45,9 @@ export class ClientService {
     return this.httpClient.get<Client[]>(`${this.API_URL}/status/${status}`);
   }
 
-  // Mettre à jour un client
-  updateClient(clientId: number, client: Partial<Client>): Observable<Client> {
-    return this.httpClient.put<Client>(`${this.API_URL}/${clientId}`, client);
+  // Mettre à jour un client (mise à jour partielle)
+  updateClient(clientId: number, client: UpdateClientDto): Observable<Client> {
+    return this.httpClient.patch<Client>(`${this.API_URL}/${clientId}`, client);
   }
 
   // Mettre à jour le statut d'un client

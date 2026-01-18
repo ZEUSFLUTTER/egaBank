@@ -24,6 +24,7 @@ interface NavItem {
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
+  host: { 'ngSkipHydration': 'true' }
 })
 export class Sidebar implements OnInit {
   // Expose methods for parent component

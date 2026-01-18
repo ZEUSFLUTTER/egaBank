@@ -6,6 +6,7 @@ import com.ega.bank.bank_management_system.dto.ClientDto;
 import com.ega.bank.bank_management_system.dto.LoginRequestDto;
 import com.ega.bank.bank_management_system.dto.LoginResponseDto;
 import com.ega.bank.bank_management_system.dto.RegisterClientDto;
+import com.ega.bank.bank_management_system.dto.UpdateClientDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.enums.ClientStatus;
 
@@ -17,6 +18,8 @@ public interface ClientService {
     LoginResponseDto authenticateClient(LoginRequestDto loginDto);
     
     Client updateClient(Long id, ClientDto clientDto);
+    
+    Client partialUpdateClient(Long id, UpdateClientDto updateDto);
     
     void deleteClient(Long id);
     

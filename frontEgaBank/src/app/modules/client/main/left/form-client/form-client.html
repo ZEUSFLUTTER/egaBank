@@ -118,24 +118,6 @@
           class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
         <small *ngIf="submitted && customerForm.hasError('passwordMismatch')" class="text-red-600 text-sm font-medium">Les mots de passe ne correspondent pas</small>
       </div>
-
-      <div class="space-y-2">
-        <label class="block text-slate-800 text-sm font-bold">Profession</label>
-        <input type="text" formControlName="profession" placeholder="Votre profession"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-      </div>
-
-      <div class="space-y-2">
-        <label class="block text-slate-800 text-sm font-bold">Type de pièce d'identité</label>
-        <input type="text" formControlName="pieceIdentite" placeholder="Passeport, Carte d'identité, etc."
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-      </div>
-
-      <div class="space-y-2">
-        <label class="block text-slate-800 text-sm font-bold">Numéro de pièce d'identité</label>
-        <input type="text" formControlName="numeroPiece" placeholder="Numéro de la pièce d'identité"
-          class="w-full bg-white border-2 border-slate-300 text-slate-900 rounded-lg px-4 py-3 text-base font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-      </div>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t-2 border-slate-200">
