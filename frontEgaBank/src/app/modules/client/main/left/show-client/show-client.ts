@@ -40,7 +40,7 @@ export class ShowClient implements OnInit, OnDestroy {
   showClientEdit = false;
   showClientAccounts = false;
   showStatusDialog = false;
-  
+
   // Current data
   selectedClient: Client | null = null;
   selectedClientAccounts: Compte[] = [];
@@ -139,7 +139,7 @@ export class ShowClient implements OnInit, OnDestroy {
   async viewClient(client: Client): Promise<void> {
     this.selectedClient = client;
     this.showClientDetail = true;
-    
+
     // Charger les comptes du client
     this.loadClientAccounts(client.id);
   }
@@ -152,15 +152,15 @@ export class ShowClient implements OnInit, OnDestroy {
   async changeStatus(client: Client): Promise<void> {
     const statuses = Object.values(ClientStatus).filter(status => status !== client.status);
     const statusOptions = statuses.map(status => ({ label: status, value: status }));
-    
+
     let selectedStatus: ClientStatus | null = null;
-    
+
     // Créer un dialogue de sélection de statut
     const confirmed = await this.dialogService.confirmAction(
       'Changer le statut',
       `Voulez-vous changer le statut de ${client.nom} ${client.prenom} ?\nStatut actuel: ${client.status}`
     );
-    
+
     if (confirmed) {
       // Pour l'instant, on alterne entre ACTIVE et SUSPENDED
       const newStatus = client.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
@@ -181,7 +181,7 @@ export class ShowClient implements OnInit, OnDestroy {
         if (accounts.length > 0) {
           // Le client a des comptes, demander confirmation pour tout supprimer
           const message = `Êtes-vous sûr de vouloir supprimer le client ${client.nom} ${client.prenom} ?\n\n⚠️ Ce client a ${accounts.length} compte(s) bancaire(s) qui seront aussi supprimés :\n${accounts.map(acc => `• ${acc.numCompte} (${acc.devis})`).join('\n')}\n\nCette action est irréversible.`;
-          
+
           this.dialogService.confirmAction(
             'Supprimer le client et ses comptes',
             message
@@ -195,7 +195,7 @@ export class ShowClient implements OnInit, OnDestroy {
         } else {
           // Le client n'a pas de comptes, suppression simple
           const simpleMessage = `Êtes-vous sûr de vouloir supprimer le client ${client.nom} ${client.prenom} ?\n\nCette action est irréversible.`;
-          
+
           this.dialogService.confirmAction(
             'Supprimer le client',
             simpleMessage
@@ -288,7 +288,7 @@ export class ShowClient implements OnInit, OnDestroy {
     // Supprimer d'abord les comptes du client
     this.compteService.getClientComptes(client.id).subscribe({
       next: (accounts) => {
-        const deleteObservables = accounts.map(account => 
+        const deleteObservables = accounts.map(account =>
           this.compteService.deleteCompte(client.id, account.numCompte)
         );
 
@@ -368,7 +368,7 @@ export class ShowClient implements OnInit, OnDestroy {
 
   async onSaveClient(clientData: Partial<Client>): Promise<void> {
     if (!this.selectedClient) return;
-    
+
     this.isLoading = true;
     this.cdr.detectChanges();
 
@@ -417,6 +417,7 @@ export class ShowClient implements OnInit, OnDestroy {
   }
 
   onDialogClose(result: any): void {
+    this.dialogService.sendResult(result);
     this.dialogConfig = null;
   }
 }
