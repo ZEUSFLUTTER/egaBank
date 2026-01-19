@@ -5,6 +5,7 @@ import { Home } from './modules/home/home';
 import { Main } from './modules/home/main/main';
 import { RegisterComponent } from './modules/register/register';
 import { ClientDashboardComponent } from './modules/client-dashboard/client-dashboard';
+import { DashboardStatsComponent } from './modules/client-dashboard/dashboard-stats';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -13,6 +14,11 @@ export const routes: Routes = [
   {
     path: 'client-dashboard',
     component: ClientDashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'dashboard',
+    component: DashboardStatsComponent,
     canActivate: [authGuard]
   },
   {

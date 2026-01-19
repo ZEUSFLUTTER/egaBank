@@ -10,6 +10,7 @@ export interface Compte {
   devis: string;
   status: AccountStatus;
   createdAt: Date;
+  type?: number; // 1 = CompteCourant, 2 = CompteEpargne
   client?: Client;
   operations?: Array<Operation>;
 }

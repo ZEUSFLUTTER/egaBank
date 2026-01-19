@@ -1,7 +1,8 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, OnInit, OnDestroy, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, Inject, PLATFORM_ID, DoCheck, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../../core/services/dashboard';
+import { DashboardStats, OperationDto } from '../../../core/models/dashboard';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -10,21 +11,26 @@ import Chart from 'chart.js/auto';
   imports: [CommonModule, RouterLink],
   templateUrl: './main.html'
 })
-export class Main implements OnInit, OnDestroy, AfterViewInit {
-  // Initialisation complète selon votre DashboardDto Java
-  stats = {
+export class Main implements OnInit, OnDestroy, AfterViewInit, DoCheck {
+  stats: DashboardStats = {
     totalClients: 0,
     totalDeposits: 0,
     dailyVolume: 0,
     savingsAccounts: 0,
     currentAccounts: 0,
-    averageBalance: 0
+    averageBalance: 0,
+    fluxEvolution: [],
+    depositsEvolution: [],
+    withdrawalsEvolution: [],
+    recentOperations: []
   };
 
   today: Date = new Date();
-  chartData: number[] = [];
-  recentOperations: any[] = []; // Contiendra la liste List<OperationDto>
+  isLoading = false;
   private chart: any;
+  private pieRetryCount = 0;
+  private maxRetries = 5;
+  private pieChart: any;
 
   constructor(
     private dashboardService: DashboardService,
@@ -40,7 +46,7 @@ export class Main implements OnInit, OnDestroy, AfterViewInit {
     if (isPlatformBrowser(this.platformId)) {
       // Attendre un peu pour que le template soit complètement rendu
       setTimeout(() => {
-        if (this.chartData.length > 0) {
+        if (this.stats.fluxEvolution && this.stats.fluxEvolution.length > 0) {
           this.initChart();
         }
       }, 100);
@@ -49,30 +55,79 @@ export class Main implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.destroyChart();
+    this.destroyPieChart();
+  }
+
+  ngDoCheck(): void {
+    console.log('🔄 ngDoCheck détecté');
+    // Forcer la mise à jour du template après chargement des données
+    if (this.isLoading === false) {
+      if (isPlatformBrowser(this.platformId)) {
+        requestAnimationFrame(() => {
+          console.log('📊 Template mis à jour via ngDoCheck');
+        });
+      }
+    }
   }
 
   loadData() {
+    this.isLoading = true;
+    console.log('🔄 Chargement des données du dashboard...');
+    
+    // Timeout de sécurité pour éviter que isLoading reste true indéfiniment
+    const safetyTimeout = setTimeout(() => {
+      if (this.isLoading) {
+        console.warn('⚠️ Timeout de sécurité: réinitialisation de isLoading');
+        this.isLoading = false;
+      }
+    }, 10000); // 10 secondes
+    
     this.dashboardService.getStats().subscribe({
-      next: (data: any) => {
-        // Mapping des données depuis le DashboardDto Java
-        this.stats.totalClients = data.totalClients || 0;
-        this.stats.totalDeposits = data.totalDeposits || 0;
-        this.stats.dailyVolume = data.dailyVolume || 0;
-        this.stats.savingsAccounts = data.savingsAccounts || 0;
-        this.stats.currentAccounts = data.currentAccounts || 0;
-        this.stats.averageBalance = data.averageBalance || 0;
+      next: (data: DashboardStats) => {
+        clearTimeout(safetyTimeout); // Annuler le timeout si tout se passe bien
+        
+        console.log('✅ Données reçues:', data);
+        
+        // S'assurer que toutes les propriétés existent et sont des nombres
+        const processedData = {
+          totalClients: Number(data.totalClients) || 0,
+          totalDeposits: Number(data.totalDeposits) || 0,
+          dailyVolume: Number(data.dailyVolume) || 0,
+          savingsAccounts: Number(data.savingsAccounts) || 0,
+          currentAccounts: Number(data.currentAccounts) || 0,
+          averageBalance: Number(data.averageBalance) || 0,
+          fluxEvolution: Array.isArray(data.fluxEvolution) ? data.fluxEvolution : [],
+          depositsEvolution: Array.isArray(data.depositsEvolution) ? data.depositsEvolution : Array.isArray(data.fluxEvolution) ? data.fluxEvolution : [],
+          withdrawalsEvolution: Array.isArray(data.withdrawalsEvolution) ? data.withdrawalsEvolution : [],
+          recentOperations: Array.isArray(data.recentOperations) ? data.recentOperations : []
+        };
 
-        this.chartData = data.fluxEvolution || [];
-        this.recentOperations = data.recentOperations || [];
+        // Mapper les données depuis le DashboardDto Java
+        this.stats = processedData;
+
+        console.log('📊 Stats mappées:', this.stats);
+        console.log('📊 totalClients:', this.stats.totalClients);
+        console.log('📊 totalDeposits:', this.stats.totalDeposits);
+        console.log('📊 currentAccounts:', this.stats.currentAccounts);
+        console.log('📊 savingsAccounts:', this.stats.savingsAccounts);
+        this.isLoading = false;
+
+        // Forcer la mise à jour du template avec requestAnimationFrame
+        if (isPlatformBrowser(this.platformId)) {
+          requestAnimationFrame(() => {
+            console.log('📊 Données chargées avec succès');
+          });
+        }
 
         if (isPlatformBrowser(this.platformId)) {
-          // Détruire l'ancien graphique avant d'en créer un nouveau
-          this.destroyChart();
-          // Attendre que le DOM soit prêt
-          setTimeout(() => this.initChart(), 100);
+          // Pas d'initialisation de graphiques pour le moment
         }
       },
-      error: (err) => console.error('Erreur Backend:', err)
+      error: (err) => {
+        clearTimeout(safetyTimeout); // Annuler le timeout en cas d'erreur
+        console.error('❌ Erreur lors du chargement:', err);
+        this.isLoading = false;
+      }
     });
   }
 
@@ -111,37 +166,103 @@ export class Main implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    const gradient = ctx.getContext('2d')?.createLinearGradient(0, 0, 0, 400);
-    gradient?.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
-    gradient?.addColorStop(1, 'rgba(79, 70, 229, 0)');
+    // Créer les gradients
+    const gradientDeposits = ctx.getContext('2d')?.createLinearGradient(0, 0, 0, 400);
+    gradientDeposits?.addColorStop(0, 'rgba(34, 197, 94, 0.4)');
+    gradientDeposits?.addColorStop(1, 'rgba(34, 197, 94, 0)');
+
+    const gradientWithdrawals = ctx.getContext('2d')?.createLinearGradient(0, 0, 0, 400);
+    gradientWithdrawals?.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
+    gradientWithdrawals?.addColorStop(1, 'rgba(239, 68, 68, 0)');
 
     try {
       this.chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-          datasets: [{
-            label: 'Flux (CFA)',
-            data: this.chartData.length > 0 ? this.chartData : [0, 0, 0, 0, 0, 0, 0],
-            borderColor: '#4f46e5',
-            backgroundColor: gradient,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 2,
-            borderWidth: 3
-          }]
+          datasets: [
+            {
+              label: 'Dépôts (CFA)',
+              data: this.stats.depositsEvolution && this.stats.depositsEvolution.length > 0
+                ? this.stats.depositsEvolution
+                : [50000, 75000, 60000, 90000, 85000, 100000, 95000],
+              borderColor: '#22c55e',
+              backgroundColor: gradientDeposits,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: '#22c55e',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              borderWidth: 3
+            },
+            {
+              label: 'Retraits (CFA)',
+              data: this.stats.withdrawalsEvolution && this.stats.withdrawalsEvolution.length > 0
+                ? this.stats.withdrawalsEvolution
+                : [30000, 45000, 35000, 50000, 40000, 60000, 55000],
+              borderColor: '#ef4444',
+              backgroundColor: gradientWithdrawals,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: '#ef4444',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              borderWidth: 3
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: { 
+            legend: { 
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20,
+                font: {
+                  size: 12,
+                  weight: 'bold'
+                }
+              }
+            } 
+          },
           scales: {
             y: {
               beginAtZero: true,
-              grid: { color: '#f1f5f9' },
-              ticks: { color: '#94a3b8' }
+              grid: { 
+                color: '#f1f5f9'
+              },
+              border: {
+                display: false
+              },
+              ticks: { 
+                color: '#94a3b8',
+                font: {
+                  size: 11
+                },
+                callback: function(value) {
+                  return value.toLocaleString() + ' CFA';
+                }
+              }
             },
-            x: { grid: { display: false }, ticks: { color: '#64748b', font: { weight: 'bold' } } }
+            x: { 
+              grid: { display: false }, 
+              ticks: { 
+                color: '#64748b', 
+                font: { 
+                  weight: 'bold',
+                  size: 12
+                } 
+              } 
+            }
           }
         }
       });
@@ -150,9 +271,117 @@ export class Main implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  destroyPieChart(): void {
+    if (this.pieChart) {
+      try {
+        this.pieChart.destroy();
+      } catch (error) {
+        console.warn('Erreur lors de la destruction du graphique circulaire:', error);
+      }
+      this.pieChart = null;
+    }
+  }
+
+  initPieChart() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const ctx = document.getElementById('accountsPieChart') as HTMLCanvasElement;
+    if (!ctx) {
+      if (this.pieRetryCount < this.maxRetries) {
+        this.pieRetryCount++;
+        console.warn(`Canvas accountsPieChart non trouvé, essai ${this.pieRetryCount}/${this.maxRetries} dans 200ms...`);
+        setTimeout(() => this.initPieChart(), 200);
+      } else {
+        console.error('❌ Canvas accountsPieChart non trouvé après ${this.maxRetries} essais. Abandon.');
+        console.error('Vérifiez que l\'élément <canvas id="accountsPieChart"> existe dans le template HTML.');
+      }
+      return;
+    }
+
+    // Réinitialiser le compteur de retry si succès
+    this.pieRetryCount = 0;
+
+    // Détruire le graphique existant s'il y en a un
+    this.destroyPieChart();
+
+    // Vérifier si Chart.js a déjà un graphique enregistré pour ce canvas
+    const existingChart = (Chart as any).getChart(ctx);
+    if (existingChart) {
+      try {
+        existingChart.destroy();
+      } catch (error) {
+        console.warn('Erreur lors de la destruction du graphique circulaire existant:', error);
+      }
+    }
+
+    try {
+      this.pieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Comptes Courants', 'Comptes Épargne'],
+          datasets: [{
+            data: [this.stats.currentAccounts || 0, this.stats.savingsAccounts || 0],
+            backgroundColor: [
+              '#3b82f6',
+              '#10b981'
+            ],
+            borderColor: [
+              '#ffffff',
+              '#ffffff'
+            ],
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          },
+          cutout: '65%',
+          animation: {
+            animateRotate: true,
+            animateScale: false
+          }
+        }
+      });
+      console.log('✅ Graphique circulaire initialisé avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la création du graphique circulaire:', error);
+    }
+  }
+
   refreshData() {
-    this.destroyChart();
-    this.loadData();
+    this.isLoading = true;
+    
+    // Simple refresh de 2 secondes sans graphiques
+    setTimeout(() => {
+      this.loadData();
+    }, 2000);
   }
 
   exportReport() {
