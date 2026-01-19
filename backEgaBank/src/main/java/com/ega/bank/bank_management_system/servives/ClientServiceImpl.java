@@ -14,6 +14,7 @@ import com.ega.bank.bank_management_system.dto.RegisterClientDto;
 import com.ega.bank.bank_management_system.dto.UpdateClientDto;
 import com.ega.bank.bank_management_system.entities.Client;
 import com.ega.bank.bank_management_system.enums.ClientStatus;
+import com.ega.bank.bank_management_system.exceptions.ClientException;
 import com.ega.bank.bank_management_system.repositories.ClientRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -45,17 +46,17 @@ public class ClientServiceImpl implements ClientService {
     public Client registerClient(RegisterClientDto registerDto) {
         // Vérifier si l'email existe déjà
         if (clientRepository.existsByEmail(registerDto.getEmail())) {
-            throw new RuntimeException("Un compte avec cet email existe déjà");
+            throw ClientException.emailAlreadyExists(registerDto.getEmail());
         }
         
         // Vérifier si le téléphone existe déjà
         if (clientRepository.existsByTelephone(registerDto.getTelephone())) {
-            throw new RuntimeException("Un compte avec ce numéro de téléphone existe déjà");
+            throw ClientException.phoneAlreadyExists(registerDto.getTelephone());
         }
         
         // Vérifier que les mots de passe correspondent
         if (!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
-            throw new RuntimeException("Les mots de passe ne correspondent pas");
+            throw ClientException.passwordMismatch();
         }
         
         Client client = new Client();
@@ -76,14 +77,14 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public LoginResponseDto authenticateClient(LoginRequestDto loginDto) {
         Client client = clientRepository.findByEmail(loginDto.getEmail())
-            .orElseThrow(() -> new RuntimeException("Email ou mot de passe incorrect"));
+            .orElseThrow(() -> ClientException.invalidCredentials());
         
         if (!passwordEncoder.matches(loginDto.getPassword(), client.getPassword())) {
-            throw new RuntimeException("Email ou mot de passe incorrect");
+            throw ClientException.invalidCredentials();
         }
         
         if (client.getStatus() != ClientStatus.ACTIVE) {
-            throw new RuntimeException("Votre compte n'est pas actif. Statut: " + client.getStatus());
+            throw ClientException.accountNotActive(client.getStatus().toString());
         }
         
         // Mettre à jour la dernière connexion
@@ -159,13 +160,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Client findOne(Long id) {
         return clientRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'ID: " + id));
+            .orElseThrow(() -> ClientException.clientNotFound(id));
     }
 
     @Override
     public Client findByEmail(String email) {
         return clientRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'email: " + email));
+            .orElseThrow(() -> ClientException.clientNotFound(email));
     }
 
     @Override

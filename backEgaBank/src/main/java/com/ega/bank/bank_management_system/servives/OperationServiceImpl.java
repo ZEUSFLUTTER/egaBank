@@ -13,6 +13,8 @@ import com.ega.bank.bank_management_system.entities.CompteBancaire;
 import com.ega.bank.bank_management_system.entities.Operation;
 import com.ega.bank.bank_management_system.enums.AccountStatus;
 import com.ega.bank.bank_management_system.enums.TypeOperation;
+import com.ega.bank.bank_management_system.exceptions.AccountException;
+import com.ega.bank.bank_management_system.exceptions.OperationException;
 import com.ega.bank.bank_management_system.repositories.CompteBancaireRepository;
 import com.ega.bank.bank_management_system.repositories.OperationRepository;
 
@@ -30,14 +32,14 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public CompteBancaire effectuerVersement(OperationDto dto) {
         if (dto.getAmount() <= 0) {
-            throw new RuntimeException("Le montant doit être positif");
+            throw AccountException.invalidAmount(dto.getAmount());
         }
         
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompteSource())
-            .orElseThrow(() -> new RuntimeException("Ce compte n'existe pas"));
+            .orElseThrow(() -> AccountException.accountNotFound(dto.getNumCompteSource()));
 
         if (!compte.getStatus().equals(AccountStatus.ACTIVATED)) {
-            throw new RuntimeException("Le compte est suspendu");
+            throw AccountException.accountSuspended(dto.getNumCompteSource());
         }
 
         compte.setBalance(compte.getBalance() + dto.getAmount());
@@ -68,18 +70,18 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public CompteBancaire effectuerRetrait(OperationDto dto) {
         if (dto.getAmount() <= 0) {
-            throw new RuntimeException("Le montant doit être positif");
+            throw AccountException.invalidAmount(dto.getAmount());
         }
         
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompteSource())
-            .orElseThrow(() -> new RuntimeException("Ce compte n'existe pas"));
+            .orElseThrow(() -> AccountException.accountNotFound(dto.getNumCompteSource()));
 
         if (!compte.getStatus().equals(AccountStatus.ACTIVATED)) {
-            throw new RuntimeException("Le compte est suspendu");
+            throw AccountException.accountSuspended(dto.getNumCompteSource());
         }
 
         if (compte.getBalance() < dto.getAmount()) {
-            throw new RuntimeException("Solde insuffisant");
+            throw AccountException.insufficientBalance(compte.getBalance(), dto.getAmount());
         }
 
         compte.setBalance(compte.getBalance() - dto.getAmount());
@@ -115,15 +117,15 @@ public class OperationServiceImpl implements OperationService {
         try {
             // Validation des données d'entrée
             if (dto.getAmount() <= 0) {
-                throw new RuntimeException("Le montant doit être positif");
+                throw AccountException.invalidAmount(dto.getAmount());
             }
             
             if (dto.getNumCompteSource() == null || dto.getNumCompteSource().trim().isEmpty()) {
-                throw new RuntimeException("Le numéro de compte source est requis");
+                throw OperationException.transferFailed("Le numéro de compte source est requis");
             }
             
             if (dto.getNumCompteDestination() == null || dto.getNumCompteDestination().trim().isEmpty()) {
-                throw new RuntimeException("Le numéro de compte destination est requis");
+                throw OperationException.transferFailed("Le numéro de compte destination est requis");
             }
             
             String numCompteSource = dto.getNumCompteSource();
@@ -132,28 +134,28 @@ public class OperationServiceImpl implements OperationService {
             System.out.println("Recherche du compte source: " + numCompteSource);
             // Vérifier que les comptes existent
             CompteBancaire compteSource = compteBancaireRepository.findByNumCompte(numCompteSource)
-                .orElseThrow(() -> new RuntimeException("Compte source n'existe pas"));
+                .orElseThrow(() -> AccountException.accountNotFound(numCompteSource));
             
             System.out.println("Compte source trouvé: " + compteSource.getId() + ", Balance: " + compteSource.getBalance());
             
             System.out.println("Recherche du compte destination: " + numCompteDestination);
             CompteBancaire compteDestination = compteBancaireRepository.findByNumCompte(numCompteDestination)
-                .orElseThrow(() -> new RuntimeException("Compte destination n'existe pas"));
+                .orElseThrow(() -> AccountException.accountNotFound(numCompteDestination));
             
             System.out.println("Compte destination trouvé: " + compteDestination.getId() + ", Balance: " + compteDestination.getBalance());
 
             // Vérifier le statut des comptes
             if (!compteSource.getStatus().equals(AccountStatus.ACTIVATED)) {
-                throw new RuntimeException("Le compte source est suspendu");
+                throw AccountException.accountSuspended(numCompteSource);
             }
             
             if (!compteDestination.getStatus().equals(AccountStatus.ACTIVATED)) {
-                throw new RuntimeException("Le compte destination est suspendu");
+                throw AccountException.accountSuspended(numCompteDestination);
             }
 
             // Vérifier le solde
             if (compteSource.getBalance() < dto.getAmount()) {
-                throw new RuntimeException("Solde insuffisant");
+                throw AccountException.insufficientBalance(compteSource.getBalance(), dto.getAmount());
             }
 
             System.out.println("Mise à jour des soldes...");
@@ -220,14 +222,14 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public Operation effectuerOperation(OperationRequestDto dto) {
         if (dto.getAmount() <= 0) {
-            throw new RuntimeException("Le montant doit être positif");
+            throw AccountException.invalidAmount(dto.getAmount());
         }
         
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(dto.getNumCompte())
-            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+            .orElseThrow(() -> AccountException.accountNotFound(dto.getNumCompte()));
 
         if (!compte.getStatus().equals(AccountStatus.ACTIVATED)) {
-            throw new RuntimeException("Le compte est suspendu");
+            throw AccountException.accountSuspended(dto.getNumCompte());
         }
 
         Operation operation = new Operation();
@@ -243,27 +245,27 @@ public class OperationServiceImpl implements OperationService {
                 break;
             case RETRAIT:
                 if (compte.getBalance() < dto.getAmount()) {
-                    throw new RuntimeException("Solde insuffisant");
+                    throw AccountException.insufficientBalance(compte.getBalance(), dto.getAmount());
                 }
                 compte.setBalance(compte.getBalance() - dto.getAmount());
                 break;
             case VIREMENT:
                 if (dto.getNumCompteDestinataire() == null) {
-                    throw new RuntimeException("Compte destinataire requis pour un virement");
+                    throw OperationException.transferFailed("Compte destinataire requis pour un virement");
                 }
                 if (compte.getBalance() < dto.getAmount()) {
-                    throw new RuntimeException("Solde insuffisant");
+                    throw AccountException.insufficientBalance(compte.getBalance(), dto.getAmount());
                 }
                 compte.setBalance(compte.getBalance() - dto.getAmount());
                 
                 CompteBancaire compteDestinataire = compteBancaireRepository
                     .findByNumCompte(dto.getNumCompteDestinataire())
-                    .orElseThrow(() -> new RuntimeException("Compte destinataire non trouvé"));
+                    .orElseThrow(() -> AccountException.accountNotFound(dto.getNumCompteDestinataire()));
                 compteDestinataire.setBalance(compteDestinataire.getBalance() + dto.getAmount());
                 compteBancaireRepository.save(compteDestinataire);
                 break;
             default:
-                throw new RuntimeException("Type d'opération non supporté");
+                throw OperationException.invalidOperationType(dto.getTypeOperation().toString());
         }
 
         compteBancaireRepository.save(compte);
@@ -285,7 +287,7 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public Operation findOperationById(Long id) {
         return operationRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Opération non trouvée"));
+            .orElseThrow(() -> OperationException.operationNotFound(id));
     }
 
     @Override

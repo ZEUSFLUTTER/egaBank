@@ -15,6 +15,8 @@ import com.ega.bank.bank_management_system.entities.CompteBancaire;
 import com.ega.bank.bank_management_system.entities.CompteCourant;
 import com.ega.bank.bank_management_system.entities.CompteEpargne;
 import com.ega.bank.bank_management_system.enums.AccountStatus;
+import com.ega.bank.bank_management_system.exceptions.AccountException;
+import com.ega.bank.bank_management_system.exceptions.ClientException;
 import com.ega.bank.bank_management_system.repositories.ClientRepository;
 import com.ega.bank.bank_management_system.repositories.CompteBancaireRepository;
 
@@ -31,7 +33,7 @@ public class CompteServiceImpl implements CompteService {
     @Override
     public CompteBancaire createAccount(CompteDto compteDto) {
         Client client = clientRepository.findById(compteDto.getClientId())
-            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+            .orElseThrow(() -> ClientException.clientNotFound(compteDto.getClientId()));
 
         if (compteDto.getDecouvert() > 0) {
             CompteCourant cc = new CompteCourant();
@@ -57,7 +59,7 @@ public class CompteServiceImpl implements CompteService {
     @Override
     public CompteBancaire createAccountForClient(Long clientId, CreateCompteDto createCompteDto) {
         Client client = clientRepository.findById(clientId)
-            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+            .orElseThrow(() -> ClientException.clientNotFound(clientId));
 
         CompteBancaire compte;
         
@@ -70,7 +72,7 @@ public class CompteServiceImpl implements CompteService {
             ce.setTauxInteret(createCompteDto.getTauxInteret() != null ? createCompteDto.getTauxInteret() : 0.0);
             compte = ce;
         } else {
-            throw new RuntimeException("Type de compte invalide");
+            throw AccountException.invalidAccountType(createCompteDto.getTypeCompte());
         }
 
         compte.setNumCompte(generateNumeroCompte());
@@ -108,26 +110,26 @@ public class CompteServiceImpl implements CompteService {
     @Override
     public List<CompteBancaire> findComptesByClientId(Long clientId) {
         Client client = clientRepository.findById(clientId)
-            .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+            .orElseThrow(() -> ClientException.clientNotFound(clientId));
         return new ArrayList<>(client.getComptes());
     }
 
     @Override
     public CompteBancaire findOne(String numCompte) {
         return compteBancaireRepository.findByNumCompte(numCompte)
-            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+            .orElseThrow(() -> AccountException.accountNotFound(numCompte));
     }
 
     @Override
     public CompteBancaire findById(Long id) {
         return compteBancaireRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+            .orElseThrow(() -> AccountException.accountNotFound("ID: " + id));
     }
 
     @Override
     public boolean activeCompte(String numCompte) {
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(numCompte)
-            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+            .orElseThrow(() -> AccountException.accountNotFound(numCompte));
         
         if (compte.getStatus() == AccountStatus.SUSPENDED) {
             compte.setStatus(AccountStatus.ACTIVATED);
@@ -140,7 +142,7 @@ public class CompteServiceImpl implements CompteService {
     @Override
     public boolean suspendCompte(String numCompte) {
         CompteBancaire compte = compteBancaireRepository.findByNumCompte(numCompte)
-            .orElseThrow(() -> new RuntimeException("Compte non trouvé"));
+            .orElseThrow(() -> AccountException.accountNotFound(numCompte));
         
         if (compte.getStatus() == AccountStatus.ACTIVATED) {
             compte.setStatus(AccountStatus.SUSPENDED);

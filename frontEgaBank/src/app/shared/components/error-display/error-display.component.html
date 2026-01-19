@@ -1,0 +1,55 @@
+<div *ngIf="currentError" [class]="getErrorClass()" role="alert">
+  <div class="error-display__header">
+    <span class="error-display__icon">{{ getErrorIcon() }}</span>
+    <h3 class="error-display__title">{{ getErrorTitle() }}</h3>
+    <button class="error-display__close" (click)="hideError()" aria-label="Fermer">
+      ✕
+    </button>
+  </div>
+  
+  <div class="error-display__content">
+    <p class="error-display__message">{{ currentError?.message }}</p>
+    
+    <!-- Afficher les détails si disponibles -->
+    <div *ngIf="hasDetails() && showDetails" class="error-display__details">
+      <h4 class="error-display__details-title">Détails techniques:</h4>
+      
+      <!-- Si les détails sont un objet -->
+      <div *ngIf="isObjectDetails()" class="error-display__details-object">
+        <div *ngFor="let key of getDetailsKeys()" class="error-display__detail-item">
+          <strong>{{ key }}:</strong>
+          <span>{{ formatDetailValue(getDetailValue(key)) }}</span>
+        </div>
+      </div>
+      
+      <!-- Si les détails sont une chaîne -->
+      <div *ngIf="!isObjectDetails() && currentError.details" class="error-display__details-text">
+        {{ currentError?.details }}
+      </div>
+    </div>
+    
+    <!-- Actions possibles -->
+    <div *ngIf="currentError.action" class="error-display__actions">
+      <button 
+        *ngIf="currentError.action === 'Réessayer'" 
+        class="error-display__btn error-display__btn--retry"
+        (click)="onRetry()">
+        🔄 Réessayer
+      </button>
+      
+      <button 
+        class="error-display__btn error-display__btn--copy"
+        (click)="onCopyError()"
+        title="Copier l'erreur">
+        📋 Copier
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay pour les erreurs critiques -->
+<div 
+  *ngIf="isVisible && currentError?.type === 'error'" 
+  class="error-display__overlay"
+  (click)="hideError()">
+</div>

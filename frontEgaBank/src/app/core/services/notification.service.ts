@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { ErrorInfo } from './error-handler.service';
 
 export interface NotificationData {
-  type: 'operation' | 'compte' | 'client';
-  action: 'create' | 'update' | 'delete';
+  type: 'operation' | 'compte' | 'client' | 'error' | 'success';
+  action: 'create' | 'update' | 'delete' | 'show';
   data?: any;
   message?: string;
 }
@@ -81,6 +82,25 @@ export class NotificationService {
       action: 'update',
       data: client,
       message: 'Client mis à jour'
+    });
+  }
+
+  // Méthodes pour gérer les erreurs et succès
+  showError(errorInfo: ErrorInfo) {
+    this.sendNotification({
+      type: 'error',
+      action: 'show',
+      data: errorInfo,
+      message: errorInfo.message
+    });
+  }
+
+  showSuccess(message: string, data?: any) {
+    this.sendNotification({
+      type: 'success',
+      action: 'show',
+      data: data,
+      message: message
     });
   }
 }

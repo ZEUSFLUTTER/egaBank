@@ -234,6 +234,12 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
     this.operationForm.get('numCompteDestinataire')?.updateValueAndValidity();
   }
 
+  showNewAccountModal() {
+    this.showCreateCompteModal = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
   closeOperationModal() {
     this.showOperationModalFlag = false;
     this.operationForm.reset();
