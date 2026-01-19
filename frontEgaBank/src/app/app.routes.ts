@@ -6,6 +6,9 @@ import { Main } from './modules/home/main/main';
 import { RegisterComponent } from './modules/register/register';
 import { ClientDashboardComponent } from './modules/client-dashboard/client-dashboard';
 import { DashboardStatsComponent } from './modules/client-dashboard/dashboard-stats';
+import { MesComptesComponent } from './modules/mes-comptes/mes-comptes.component';
+import { HistoriqueComponent } from './modules/historique/historique.component';
+import { ProfilComponent } from './modules/profil/profil.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -19,6 +22,21 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardStatsComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'mes-comptes',
+    component: MesComptesComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'historique',
+    component: HistoriqueComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'profil',
+    component: ProfilComponent,
     canActivate: [authGuard]
   },
   {

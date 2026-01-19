@@ -257,20 +257,32 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
         this.updateFormDisabledState();
         this.successMessage = 'Opération effectuée avec succès !';
 
+        // Recharger les données immédiatement après succès
         setTimeout(() => {
           this.closeOperationModal();
+          
+          // Forcer le rechargement complet des données
           this.loadComptes();
+          this.calculateTotalBalance();
+          
+          // Recharger les opérations du compte sélectionné
           if (this.selectedCompte) {
             this.loadOperations(this.selectedCompte.numCompte);
           }
+          
+          // Notifier les autres composants
           this.notificationService.forceRefresh('comptes');
           this.notificationService.forceRefresh('operations');
+          
+          // Forcer un deuxième rechargement après un délai
+          setTimeout(() => {
+            this.loadComptes();
+          }, 500);
         }, 1000);
       },
       error: (error) => {
         this.loading = false;
         this.updateFormDisabledState()
-        this.loading = false;
         this.errorMessage = error.error?.message || error.error || 'Erreur lors de l\'opération';
       }
     });
@@ -304,5 +316,44 @@ export class ClientDashboardComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  // Navigation methods for sidebar
+  navigateToDashboard() {
+    // Already on dashboard, just refresh data
+    this.loadComptes();
+    this.calculateTotalBalance();
+  }
+
+  navigateToAccounts() {
+    // Navigate to mes comptes page
+    this.router.navigate(['/mes-comptes']);
+  }
+
+  navigateToTransactions() {
+    // Navigate to historique page
+    this.router.navigate(['/historique']);
+  }
+
+  navigateToSettings() {
+    // Navigate to profil page
+    this.router.navigate(['/profil']);
+  }
+
+  // Format card number for display
+  formatCardNumber(accountNumber: string | undefined | null): string {
+    if (!accountNumber) return '**** **** **** 1234';
+    
+    // Remove any non-digit characters
+    const cleanNumber = accountNumber.replace(/\D/g, '');
+    
+    // If we have less than 16 digits, pad with random digits
+    let fullNumber = cleanNumber.padEnd(16, '0');
+    
+    // Take last 4 digits for display
+    const lastFour = fullNumber.slice(-4);
+    
+    return `**** **** **** ${lastFour}`;
   }
 }

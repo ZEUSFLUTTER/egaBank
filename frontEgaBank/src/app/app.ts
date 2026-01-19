@@ -8,9 +8,9 @@ import { CommonModule } from '@angular/common';
   imports: [
     RouterOutlet,
     CommonModule
-],
+  ],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrls: ['./app.scss'],
 })
 export class App {
   protected readonly title = signal('frontEgaBank');
