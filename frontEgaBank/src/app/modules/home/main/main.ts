@@ -65,9 +65,42 @@ export class Main implements OnInit, OnDestroy, AfterViewInit, DoCheck {
       if (isPlatformBrowser(this.platformId)) {
         requestAnimationFrame(() => {
           console.log('📊 Template mis à jour via ngDoCheck');
+          
+          // Initialiser les graphiques si les données sont disponibles
+          if (this.stats.fluxEvolution && this.stats.fluxEvolution.length > 0) {
+            setTimeout(() => {
+              this.initChart();
+            }, 100);
+          } else if (this.stats.totalClients > 0 || this.stats.totalDeposits > 0) {
+            // Utiliser des données par défaut si fluxEvolution est vide
+            setTimeout(() => {
+              this.stats.fluxEvolution = [10000, 15000, 12000, 18000, 20000, 16000, 22000];
+              this.stats.depositsEvolution = [50000, 75000, 60000, 90000, 85000, 100000, 95000];
+              this.stats.withdrawalsEvolution = [30000, 45000, 35000, 50000, 40000, 60000, 55000];
+              this.initChart();
+            }, 100);
+          }
         });
       }
     }
+  }
+
+  // Méthodes pour le cercle dynamique
+  getCircleDashArray(currentAccounts: number, savingsAccounts: number): string {
+    const total = currentAccounts + savingsAccounts;
+    if (total === 0) return '0 628'; // Cercle vide
+    
+    const percentage = (currentAccounts / total) * 100;
+    const circumference = 2 * Math.PI * 100; // 2πr avec r=100
+    const dashLength = (percentage / 100) * circumference;
+    
+    return `${dashLength} ${circumference}`;
+  }
+
+  getPercentage(value: number, otherValue: number): number {
+    const total = value + otherValue;
+    if (total === 0) return 0;
+    return Math.round((value / total) * 100);
   }
 
   loadData() {
