@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EgaBank API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .api-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .api-info h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .endpoint-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .endpoint-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .endpoint-section h3::before {
+            content: "🔗";
+        }
+        
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .endpoint:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: #212529; }
+        .delete { background: #dc3545; color: white; }
+        
+        .url {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .description {
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .examples {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .error-codes {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .error-code {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        .error { background: #f8d7da; color: #721c24; }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .endpoint {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 EgaBank API Documentation</h1>
+            <p>API REST complète pour la gestion bancaire</p>
+        </div>
+        
+        <div class="api-info">
+            <h2>Informations Générales</h2>
+            <p><strong>Version:</strong> 1.0.0</p>
+            <p><strong>Base URL:</strong> <code>http://localhost:8080</code></p>
+            <p><strong>Format:</strong> JSON</p>
+            <p><strong>Authentification:</strong> JWT (pour certains endpoints)</p>
+        </div>
+        
+        <div id="endpoints-container">
+            <div class="endpoint-section">
+                <h3>Authentification</h3>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/auth/login</span>
+                    <div class="description">Connexion administrateur</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/auth/client/register</span>
+                    <div class="description">Inscription client</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/auth/client/login</span>
+                    <div class="description">Connexion client</div>
+                </div>
+            </div>
+            
+            <div class="endpoint-section">
+                <h3>Gestion des Clients</h3>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/clients</span>
+                    <div class="description">Lister tous les clients</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/clients</span>
+                    <div class="description">Créer un client</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/clients/{id}</span>
+                    <div class="description">Obtenir un client par ID</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/v1/clients/{id}</span>
+                    <div class="description">Mettre à jour un client</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method delete">DELETE</span>
+                    <span class="url">/api/v1/clients/{id}</span>
+                    <div class="description">Supprimer un client</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/clients/search</span>
+                    <div class="description">Rechercher des clients</div>
+                </div>
+            </div>
+            
+            <div class="endpoint-section">
+                <h3>Gestion des Comptes</h3>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/comptes</span>
+                    <div class="description">Créer un compte</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/comptes/type/{type}</span>
+                    <div class="description">Lister par type (CC/CE)</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/comptes/{numCompte}/{type}</span>
+                    <div class="description">Obtenir un compte</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/v1/comptes/active/{numCompte}</span>
+                    <div class="description">Activer un compte</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/v1/comptes/suspendre/{numCompte}</span>
+                    <div class="description">Suspendre un compte</div>
+                </div>
+            </div>
+            
+            <div class="endpoint-section">
+                <h3>Gestion des Opérations</h3>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/operations/versement</span>
+                    <div class="description">Effectuer un versement</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/operations/retrait</span>
+                    <div class="description">Effectuer un retrait</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/v1/operations/virement</span>
+                    <div class="description">Effectuer un virement</div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/operations/client/{numCompte}</span>
+                    <div class="description">Lister opérations client</div>
+                </div>
+            </div>
+            
+            <div class="endpoint-section">
+                <h3>Dashboard</h3>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/v1/dashboard/stats</span>
+                    <div class="description">Obtenir les statistiques</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="examples">
+            <h2>Exemples de Requêtes</h2>
+            
+            <h3>Connexion Administrateur</h3>
+            <div class="example">
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "admin123"
+}
+            </div>
+            
+            <h3>Création Client</h3>
+            <div class="example">
+POST /api/v1/clients
+Content-Type: application/json
+
+{
+    "nom": "Martin",
+    "prenom": "Sophie",
+    "email": "sophie.martin@email.com",
+    "telephone": "0623456789",
+    "adresse": "456 Avenue des Champs-Élysées, Paris",
+    "dateNaissance": "1985-05-20",
+    "password": "password456"
+}
+            </div>
+            
+            <h3>Virement</h3>
+            <div class="example">
+POST /api/v1/operations/virement
+Content-Type: application/json
+
+{
+    "numCompteSource": "CC123456",
+    "numCompteDestination": "CE789012",
+    "amount": 300.0,
+    "description": "Virement vers épargne"
+}
+            </div>
+        </div>
+        
+        <div class="error-codes">
+            <h2>Codes d'Erreur</h2>
+            <div>
+                <span class="error-code success">200</span> Succès
+                <span class="error-code success">201</span> Créé avec succès
+                <span class="error-code warning">400</span> Erreur de validation
+                <span class="error-code error">401</span> Non autorisé
+                <span class="error-code error">404</span> Non trouvé
+                <span class="error-code error">500</span> Erreur serveur
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Tester l'API</h2>
+            <button class="test-button" onclick="testApi()">Tester la connexion à l'API</button>
+            <div id="test-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 EgaBank - Documentation API v1.0.0</p>
+        </div>
+    </div>
+    
+    <script>
+        async function testApi() {
+            const resultDiv = document.getElementById('test-result');
+            const button = document.querySelector('.test-button');
+            
+            button.textContent = 'Test en cours...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/docs/health');
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#d4edda';
+                resultDiv.style.color = '#155724';
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                
+                button.textContent = '✅ API Connectée';
+                button.style.background = '#28a745';
+                
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.textContent = 'Erreur de connexion à l\'API: ' + error.message;
+                
+                button.textContent = '❌ Erreur de connexion';
+                button.style.background = '#dc3545';
+            }
+            
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = 'Tester la connexion à l\'API';
+                button.style.background = '';
+            }, 3000);
+        }
+        
+        // Charger la documentation dynamique
+        async function loadDocumentation() {
+            try {
+                const response = await fetch('/api/docs');
+                const data = await response.json();
+                console.log('Documentation API chargée:', data);
+            } catch (error) {
+                console.log('Impossible de charger la documentation dynamique:', error);
+            }
+        }
+        
+        // Charger au démarrage
+        loadDocumentation();
+    </script>
+</body>
+</html>

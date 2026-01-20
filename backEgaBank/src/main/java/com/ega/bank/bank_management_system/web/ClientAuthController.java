@@ -26,6 +26,7 @@ public class ClientAuthController {
     private final ClientService clientService;
     
     @PostMapping("/register")
+    //@Operation(summary = "Inscription client", description = "Crée un nouveau compte client")
     public ResponseEntity<?> registerClient(@Valid @RequestBody RegisterClientDto registerDto) {
         try {
             Client client = clientService.registerClient(registerDto);
@@ -36,6 +37,7 @@ public class ClientAuthController {
     }
     
     @PostMapping("/login")
+    //@Operation(summary = "Connexion client", description = "Authentifie un client et retourne un token JWT")
     public ResponseEntity<?> loginClient(@Valid @RequestBody LoginRequestDto loginDto) {
         try {
             LoginResponseDto response = clientService.authenticateClient(loginDto);
