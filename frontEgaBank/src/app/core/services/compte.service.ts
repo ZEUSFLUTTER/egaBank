@@ -37,6 +37,11 @@ export class CompteService {
     return this.httpClient.put<boolean>(`${this.API_URL}/suspendre/${numCompte}`, {});
   }
 
+  // Supprimer un compte (endpoint admin)
+  deleteCompteAdmin(numCompte: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/${numCompte}`);
+  }
+
   // ===== Nouveaux endpoints pour les clients =====
 
   // Obtenir tous les comptes d'un client

@@ -16,10 +16,11 @@ import com.ega.bank.bank_management_system.servives.ClientService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/auth/client")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RequiredArgsConstructor
 public class ClientAuthController {
     
@@ -41,6 +42,18 @@ public class ClientAuthController {
     public ResponseEntity<?> loginClient(@Valid @RequestBody LoginRequestDto loginDto) {
         try {
             LoginResponseDto response = clientService.authenticateClient(loginDto);
+            
+            // 🔐 Afficher le token dans la console pour faciliter le copier-coller
+            System.out.println("\n" + "=".repeat(80));
+            System.out.println("🔐 CLIENT TOKEN - COPIEZ CE TOKEN:");
+            System.out.println("📋 Token: " + response.getToken());
+            System.out.println("🎯 Pour Postman: Authorization: Bearer " + response.getToken());
+            System.out.println("👤 Client ID: " + response.getClientId());
+            System.out.println("📧 Email: " + response.getEmail());
+            System.out.println("👤 Full Name: " + response.getFullName());
+            System.out.println("📊 Status: " + response.getStatus());
+            System.out.println("=".repeat(80) + "\n");
+            
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());

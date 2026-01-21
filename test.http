@@ -1,9 +1,224 @@
-http://localhost:8080/api/v1/auth
+### Variables Globales
+@baseUrl = http://localhost:8080/api/v1
+@authUrl = http://localhost:8080/api/auth
 
-POST /api/v1/auth/login
+### Variables d'Identifiants
+@adminId = 1
+@clientId = 103
+@otherClientId = 107
+
+### Variables de Comptes
+
+@numCompte = CMEG A1.6 1992 9042 0696 4774 e
+
+@compteSource = CMEG A3.2 6880 4184 7750 4302 e
+@compteDestination = CMEG A1.6 1992 9042 0696 4774 e
+@compteCourant = CMEG A3.2 6880 4184 7750 4302 e
+@compteEpargne = CMEG A1.6 1992 9042 0696 4774 e
+
+### Variables d'Authentification (À mettre à jour après login)
+@adminToken =  jwt-token-placeholder
+@clientToken = EgaBank-bWFsaWtAZ21haWwuY29tOjEwMzoxNzY5MDAwNzAxOTk3
+
+############################################################
+### 1. AUTHENTIFICATION & INSCRIPTION
+############################################################
+
+### Inscription d'un nouveau client
+POST {{authUrl}}/client/register
+Content-Type: application/json
+
+{
+    "nom": "Martin",
+    "prenom": "Sophie",
+    "email": "sophie.martin@email.com",
+    "telephone": "0623456789",
+    "adresse": "456 Avenue des Champs-Élysées",
+    "birthday": "1985-05-20",
+    "password": "password456",
+    "confirmPassword": "password456"
+}
+
+### Login Admin
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
     "username": "admin",
     "password": "admin123"
+}
+
+### Login Client
+POST {{authUrl}}/client/login
+Content-Type: application/json
+
+{
+    "email": "malik@gmail.com",
+    "password": "12345678"
+}
+
+############################################################
+### 2. ACTIONS ADMINISTRATEUR
+############################################################
+
+### Activer le compte d'un client
+PATCH {{baseUrl}}/clients/{{otherClientId}}/activate
+Authorization: Bearer {{adminToken}}
+
+### Voir les statistiques du dashboard
+GET {{baseUrl}}/dashboard/stats
+Authorization: Bearer {{adminToken}}
+
+### Lister tous les clients
+GET {{baseUrl}}/clients
+Authorization: Bearer {{adminToken}}
+
+### Créer un client manuellement
+POST {{baseUrl}}/clients
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "nom": "TCHABODJO",
+    "prenom": "Jamil",
+    "email": "jamil.nouveau@email.com", 
+    "telephone": "22890000005",
+    "birthday": "1995-10-10",
+    "nationalite": "Togolaise",
+    "address": "Quartier Adidogomé, Lomé",
+    "sexe": "M"
+}
+
+### Modifier les informations d'un client
+PATCH {{baseUrl}}/clients/{{clientId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "nom": "Martin Modifié",
+    "telephone": "0600000000"
+}
+
+### Supprimer un client
+DELETE {{baseUrl}}/clients/105
+Authorization: Bearer {{adminToken}}
+
+### Lister les comptes par type (CC ou CE)
+GET {{baseUrl}}/comptes/type/CC
+Authorization: Bearer {{adminToken}}
+
+### Effectuer un versement admin
+POST {{baseUrl}}/operations/versement
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "numCompteSource": "{{compteCourant}}",
+    "amount": 200000,
+    "description": "Dépôt espèces"
+}
+
+### Effectuer un retrait admin
+POST {{baseUrl}}/operations/retrait
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "numCompteSource": "{{compteCourant}}",
+    "amount": 200000,
+    "description": "Retrait exceptionnel en agence"
+}
+
+### Effectuer un virement admin
+POST {{baseUrl}}/operations/virement
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "numCompteSource": "{{compteSource}}",
+    "numCompteDestination": "{{compteDestination}}",
+    "amount": 1000000,
+    "description": "Virement administratif"
+}
+
+### [ADMIN] Supprimer un compte bancaire
+DELETE {{baseUrl}}/comptes/{{numCompte}}
+Authorization: Bearer jwt-token-placeholder
+
+### [ADMIN] Activer un compte bancaire
+PUT {{baseUrl}}/comptes/active/{{numCompte}}
+Authorization: Bearer jwt-token-placeholder
+
+### [ADMIN] Suspendre un compte bancaire
+PUT {{baseUrl}}/comptes/suspendre/{{numCompte}}
+Authorization: Bearer jwt-token-placeholder
+
+############################################################
+### 3. ESPACE CLIENT
+############################################################
+
+### Créer un compte COURANT
+POST {{baseUrl}}/clients/{{clientId}}/comptes
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+    "typeCompte": 1,
+    "balanceInitial": 250000,
+    "devis": "XOF",
+    "decouvert": 50000
+}
+
+### Créer un compte ÉPARGNE
+POST {{baseUrl}}/clients/{{clientId}}/comptes
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+    "typeCompte": 2,
+    "balanceInitial": 250000,
+    "devis": "XOF",
+    "tauxInteret": 3.5
+}
+
+### Effectuer un dépôt client
+POST {{baseUrl}}/clients/{{clientId}}/operations
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+    "numCompte": "{{compteCourant}}",
+    "typeOperation": "DEPOT",
+    "amount": 1000000,
+    "description": "Dépôt via mobile"
+}
+
+### Effectuer un virement client
+POST {{baseUrl}}/operations/virement
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+    "numCompteSource": "{{compteSource}}",
+    "numCompteDestination": "{{compteDestination}}",
+    "amount": 1500,
+    "description": "Remboursement déjeuner"
+}
+
+### Voir ses comptes bancaires
+GET {{baseUrl}}/clients/{{clientId}}/comptes
+Authorization: Bearer {{clientToken}}
+
+### Voir l'historique d'un compte spécifique
+GET {{baseUrl}}/clients/{{clientId}}/operations/compte/{{compteCourant}}
+Authorization: Bearer {{clientToken}}
+
+### Modifier son profil personnel
+PATCH {{baseUrl}}/clients/{{clientId}}
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+    "telephone": "90279710",
+    "address": "Nyekonakpoe"
 }

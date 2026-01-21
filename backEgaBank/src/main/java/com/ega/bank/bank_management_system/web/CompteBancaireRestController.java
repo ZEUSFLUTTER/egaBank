@@ -12,7 +12,7 @@ import com.ega.bank.bank_management_system.servives.CompteService;
 
 @RestController
 @RequestMapping(value = "/api/v1")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class CompteBancaireRestController {
 
     private final CompteService compteService;
@@ -67,5 +67,15 @@ public class CompteBancaireRestController {
     @PutMapping("/comptes/suspendre/{numCompte}")
     public void suspendreCompte(@PathVariable("numCompte") String numCompte) {
         this.compteService.suspendCompte(numCompte);
+    }
+
+    @DeleteMapping("/comptes/{numCompte}")
+    public ResponseEntity<Void> deleteCompte(@PathVariable("numCompte") String numCompte) {
+        try {
+            this.compteService.deleteCompte(numCompte);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

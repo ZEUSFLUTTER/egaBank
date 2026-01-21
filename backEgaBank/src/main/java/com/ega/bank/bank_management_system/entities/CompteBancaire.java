@@ -9,6 +9,7 @@ import com.ega.bank.bank_management_system.enums.AccountStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -46,8 +47,7 @@ public abstract  class CompteBancaire implements Serializable{
     private Client client;
 
     @JsonBackReference
-    @OneToMany(mappedBy="compte")
-
+    @OneToMany(mappedBy="compte", cascade = CascadeType.ALL, orphanRemoval = true)
     Collection<Operation> operations = new ArrayList<>();
 
 }

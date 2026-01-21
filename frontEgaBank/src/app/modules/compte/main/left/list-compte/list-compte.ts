@@ -77,7 +77,7 @@ export class ListCompte implements OnInit, OnDestroy {
       this.cdr.detectChanges();
       return;
     }
-    
+
     this.compteService.getCompte(type).subscribe({
       next: (data) => {
         this.comptes = data || [];
@@ -113,5 +113,18 @@ export class ListCompte implements OnInit, OnDestroy {
       },
       error: (err) => console.error("Erreur activation:", err)
     });
+  }
+
+  onDeleteCompte(numCompte: string): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce compte ? Cette action est irréversible.')) {
+      this.compteService.deleteCompteAdmin(numCompte).subscribe({
+        next: () => {
+          this.onGetComptes(this.type);
+          // Notifier les autres composants
+          this.notificationService.notifyCompteUpdate({ numCompte, action: 'delete' });
+        },
+        error: (err) => console.error("Erreur suppression:", err)
+      });
+    }
   }
 }

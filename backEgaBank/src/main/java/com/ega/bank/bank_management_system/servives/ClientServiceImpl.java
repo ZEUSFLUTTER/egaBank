@@ -90,8 +90,10 @@ public class ClientServiceImpl implements ClientService {
         // Mettre à jour la dernière connexion
         updateLastLogin(client.getId());
         
-        // Générer un token JWT (à implémenter avec votre service JWT)
-        String token = "jwt-token-placeholder"; // TODO: Implémenter la génération de token JWT
+        // Générer un token simple avec timestamp
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String tokenData = client.getEmail() + ":" + client.getId() + ":" + timestamp;
+        String token = "EgaBank-" + java.util.Base64.getEncoder().encodeToString(tokenData.getBytes());
         
         return LoginResponseDto.builder()
             .token(token)

@@ -19,10 +19,11 @@ import com.ega.bank.bank_management_system.servives.CompteService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/v1/clients/{clientId}/comptes")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RequiredArgsConstructor
 public class ClientCompteController {
     
@@ -47,18 +48,6 @@ public class ClientCompteController {
             return ResponseEntity.status(HttpStatus.CREATED).body(compte);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-    
-    @DeleteMapping("/{numCompte}")
-    public ResponseEntity<Void> deleteCompte(
-            @PathVariable Long clientId,
-            @PathVariable String numCompte) {
-        try {
-            compteService.deleteCompte(numCompte);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 }

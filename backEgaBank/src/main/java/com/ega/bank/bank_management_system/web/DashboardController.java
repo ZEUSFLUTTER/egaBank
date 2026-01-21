@@ -13,7 +13,7 @@ import com.ega.bank.bank_management_system.servives.DashboardService;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class DashboardController {
 
 private final DashboardService dashboardService;
