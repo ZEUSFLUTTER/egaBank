@@ -13,25 +13,25 @@
   border-radius: 0 16px 16px 0;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.3);
   font-family: "Poppins", "Segoe UI", sans-serif;
-  
+
   &.collapsed {
     width: 80px;
   }
-  
+
   // Mobile styles
   @media (max-width: 1024px) {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     border-radius: 0 16px 16px 0;
-    
+
     &.mobile-open {
       transform: translateX(0);
     }
-    
+
     &.collapsed {
       width: 280px;
       transform: translateX(-100%);
-      
+
       &.mobile-open {
         transform: translateX(0);
       }
@@ -45,21 +45,21 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   border-radius: 12px;
-  
+
   &.active {
     background: rgba(59, 130, 246, 0.15);
     border: 1px solid rgba(59, 130, 246, 0.3);
   }
-  
+
   &:hover {
     background: rgba(59, 130, 246, 0.1);
     border: 1px solid rgba(59, 130, 246, 0.2);
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
-  
+
   button {
     pointer-events: auto;
     cursor: pointer;
@@ -69,6 +69,15 @@
 
 .sidebar-nav {
   max-height: calc(100vh - 200px);
+}
+
+.sidebar-footer {
+  overflow: hidden;
+
+  button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .sidebar-user {
@@ -83,21 +92,21 @@
   opacity: 0;
   transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
   overflow: hidden;
-  
+
   &.submenu-expanded {
     max-height: 500px;
     opacity: 1;
   }
-  
+
   &.submenu-collapsed {
     max-height: 0;
     opacity: 0;
   }
-  
+
   li button {
     border-radius: 10px;
     border: 1px solid transparent;
-    
+
     &:hover {
       background: rgba(59, 130, 246, 0.08);
       border: 1px solid rgba(59, 130, 246, 0.15);

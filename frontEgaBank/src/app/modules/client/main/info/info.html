@@ -1,21 +1,80 @@
-<div class="mt-12 mb-8">
-  <h3 class="flex items-center gap-6">
-    <span class="flex-none text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 font-sans">
-      Analyse <span class="text-indigo-600/50 italic">Data</span> Clients
-    </span>
-
-    <div class="h-[1px] flex-grow bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"></div>
-
-    <div class="flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">Live Insight</span>
+<div class="p-6 animate-fade-in">
+  <div class="bg-white border-2 border-slate-200 rounded-xl p-8 shadow-lg">
+    <!-- En-tête avec titre et icône -->
+    <div class="flex items-center gap-6 mb-8">
+      <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 12H9m4 5h4m-11 2.476c.477.477 1.077.637 1.638.667C9.591 20.125 10.745 21 12 21s2.409-.875 2.362-1.307c.56-.03 1.161-.19 1.638-.667M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="flex-grow">
+        <h2 class="text-3xl font-bold text-slate-900 font-playfair mb-2">
+          Analyse des Clients
+        </h2>
+        <p class="text-lg text-slate-600 font-medium">
+          Vue d'ensemble des clients et statistiques détaillées
+        </p>
+      </div>
     </div>
-  </h3>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all">
-    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Taux de Rétention</p>
-    <p class="text-2xl font-black text-slate-900 mt-1">98.4%</p>
+    <!-- Section informative principale -->
+    <div class="mt-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl">
+      <h3 class="text-xl font-bold text-slate-900 mb-4">Fonctionnalités disponibles</h3>
+      <ul class="space-y-3">
+        <li class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">Liste des Clients</p>
+            <p class="text-slate-600 text-sm">Consultez la liste complète de tous les clients avec leurs informations essentielles</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">Créer Nouveau Client</p>
+            <p class="text-slate-600 text-sm">Ajoutez facilement de nouveaux clients au système avec toutes leurs informations</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">Gestion des Clients</p>
+            <p class="text-slate-600 text-sm">Consultez les détails des clients, leurs comptes et gérez leurs informations</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-3">
+          <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">Créer Comptes</p>
+            <p class="text-slate-600 text-sm">Créez de nouveaux comptes bancaires pour les clients existants</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Section d'instruction -->
+    <div class="mt-8 p-6 bg-slate-50 border-2 border-slate-200 rounded-xl">
+      <h3 class="text-xl font-bold text-slate-900 mb-3">Informations</h3>
+      <p class="text-slate-700 font-medium leading-relaxed">
+        Sélectionnez une option dans le menu latéral pour commencer. Vous pouvez consulter la liste des clients,
+        créer de nouveaux clients, ou gérer les informations existantes.
+      </p>
+    </div>
   </div>
-  </div>
+</div>

@@ -87,15 +87,26 @@ export class Versement implements OnInit, OnDestroy {
         this.isError = '';
         this.isSuccessed = true;
         this.isLoading = false;
+
+        const montant = this.fb.montant.value;
+        const numCompte = this.fb.numCompte.value;
+        const ancienSolde = this.compte?.balance || 0;
+        const nouveauSolde = ancienSolde + montant;
+
         this.opForm.reset();
         this.submitted = false;
         this.showDetails = false;
         this.cdr.detectChanges();
 
-        // ✅ Notification de succès
-        this.notificationService.notifyOperationSuccess('Versement effectué avec succès', {
-          ...operationData,
-          compte: this.compte
+        // ✅ Notification de succès avec détails
+        this.notificationService.notifyOperationSuccess('✓ Versement effectué avec succès', {
+          ...data,
+          montantVerse: montant,
+          numCompte: numCompte,
+          ancienSolde: ancienSolde,
+          nouveauSolde: nouveauSolde,
+          compte: this.compte,
+          message: `Un versement de ${montant} FCFA a été effectué sur le compte ${numCompte}. Ancien solde: ${ancienSolde} FCFA → Nouveau solde: ${nouveauSolde} FCFA`
         });
 
         // Forcer le rafraîchissement des composants liés
@@ -108,14 +119,29 @@ export class Versement implements OnInit, OnDestroy {
         }, 3000);
       },
       error: (err: any) => {
-        this.isError = err.error?.message || "Erreur lors de l'opération";
+        const montant = this.fb.montant.value;
+        const numCompte = this.fb.numCompte.value;
+
+        let errorMessage = err.error?.message || "Erreur lors de l'opération";
+
+        // Améliorer le message d'erreur selon le type
+        if (err.status === 404) {
+          errorMessage = `Erreur: Compte ${numCompte} introuvable.`;
+        } else if (err.status === 400) {
+          errorMessage = `Erreur: Montant invalide (${montant} FCFA). Veuillez vérifier.`;
+        } else if (err.status === 409) {
+          errorMessage = errorMessage || `Erreur: Compte ${numCompte} suspendu ou désactivé.`;
+        }
+
+        this.isError = errorMessage;
         this.isSuccessed = false;
         this.isLoading = false;
         this.cdr.detectChanges();
+
         this.notificationService.sendNotification({
           type: 'operation',
-          action: 'create',
-          message: this.isError
+          action: 'error',
+          message: `✗ Versement échoué: ${errorMessage}`
         });
       }
     });

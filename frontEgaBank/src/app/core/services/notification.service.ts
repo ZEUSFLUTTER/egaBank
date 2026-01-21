@@ -4,7 +4,7 @@ import { ErrorInfo } from './error-handler.service';
 
 export interface NotificationData {
   type: 'operation' | 'compte' | 'client' | 'error' | 'success';
-  action: 'create' | 'update' | 'delete' | 'show';
+  action: 'create' | 'update' | 'delete' | 'show' | 'error';
   data?: any;
   message?: string;
 }
@@ -13,7 +13,7 @@ export interface NotificationData {
   providedIn: 'root'
 })
 export class NotificationService {
-  
+
   // Subject pour les notifications générales
   private notificationSubject = new Subject<NotificationData>();
   public notification$ = this.notificationSubject.asObservable();
@@ -37,7 +37,7 @@ export class NotificationService {
   // Méthode pour envoyer une notification
   sendNotification(notification: NotificationData) {
     this.notificationSubject.next(notification);
-    
+
     // Déclencher le rafraîchissement spécifique
     switch (notification.type) {
       case 'operation':

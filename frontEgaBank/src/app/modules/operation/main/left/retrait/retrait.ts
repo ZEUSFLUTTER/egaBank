@@ -74,15 +74,26 @@ export class Retrait implements OnInit, OnDestroy {
         this.isError = '';
         this.isSuccessed = true;
         this.isLoading = false;
+
+        const montant = this.fb.montant.value;
+        const numCompte = this.fb.numCompte.value;
+        const ancienSolde = this.compte?.balance || 0;
+        const nouveauSolde = ancienSolde - montant;
+
         this.opForm.reset();
         this.submitted = false;
         this.showDetails = false;
         this.cdr.detectChanges();
 
-        // ✅ Notification de succès
-        this.notificationService.notifyOperationSuccess('Retrait effectué avec succès', {
-          ...operationData,
-          compte: this.compte
+        // ✅ Notification de succès avec détails
+        this.notificationService.notifyOperationSuccess('✓ Retrait effectué avec succès', {
+          ...data,
+          montantRetire: montant,
+          numCompte: numCompte,
+          ancienSolde: ancienSolde,
+          nouveauSolde: nouveauSolde,
+          compte: this.compte,
+          message: `Un retrait de ${montant} FCFA a été effectué. Ancien solde: ${ancienSolde} FCFA → Nouveau solde: ${nouveauSolde} FCFA`
         });
 
         // Forcer le rafraîchissement des composants liés
@@ -95,14 +106,29 @@ export class Retrait implements OnInit, OnDestroy {
         }, 3000);
       },
       error: (err: any) => {
-        this.isError = err.error?.message || "Erreur lors du retrait";
+        const montant = this.fb.montant.value;
+        const numCompte = this.fb.numCompte.value;
+
+        let errorMessage = err.error?.message || "Erreur lors du retrait";
+
+        // Améliorer le message d'erreur selon le type
+        if (err.status === 404) {
+          errorMessage = `Erreur: Compte ${numCompte} introuvable.`;
+        } else if (err.status === 400) {
+          errorMessage = `Erreur: Montant invalide ou solde insuffisant (${montant} FCFA demandé).`;
+        } else if (err.status === 409) {
+          errorMessage = errorMessage || `Erreur: Compte ${numCompte} suspendu ou désactivé.`;
+        }
+
+        this.isError = errorMessage;
         this.isSuccessed = false;
         this.isLoading = false;
         this.cdr.detectChanges();
+
         this.notificationService.sendNotification({
           type: 'operation',
-          action: 'create',
-          message: this.isError
+          action: 'error',
+          message: `✗ Retrait échoué: ${errorMessage}`
         });
       }
     });

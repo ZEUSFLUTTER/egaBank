@@ -23,21 +23,21 @@
           </svg>
           <span class="font-medium">Tableau de bord</span>
         </button>
-        
+
         <button class="w-full flex items-center space-x-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2z"></path>
           </svg>
           <span class="font-medium">Mes comptes</span>
         </button>
-        
+
         <button (click)="navigateToTransactions()" class="w-full flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
           </svg>
           <span class="font-medium">Historique</span>
         </button>
-        
+
         <button (click)="navigateToProfile()" class="w-full flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -48,12 +48,12 @@
     </div>
 
     <!-- Logout Section -->
-    <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
-      <button (click)="logout()" class="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 overflow-hidden">
+      <button (click)="logout()" class="w-full flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors min-w-0">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
         </svg>
-        <span class="font-medium">Déconnexion</span>
+        <span class="font-medium truncate">Déconnexion</span>
       </button>
     </div>
   </aside>
@@ -78,12 +78,12 @@
 
     <!-- Accounts Grid -->
     <div *ngIf="!loading && !errorMessage && comptes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let compte of comptes" 
+      <div *ngFor="let compte of comptes"
            class="p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
            [class.bg-white]="getAccountTypeNumber(compte) === 1"
            [class.bg-gray-800]="getAccountTypeNumber(compte) === 2"
            (click)="selectCompte(compte)">
-        
+
         <!-- Account Header -->
         <div class="flex justify-between items-start mb-4">
           <div>

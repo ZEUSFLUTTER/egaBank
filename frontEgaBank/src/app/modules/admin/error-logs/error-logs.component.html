@@ -1,7 +1,7 @@
 <div class="error-logs-container">
   <div class="error-logs-header">
     <h2>📊 Logs d'Erreurs Administrateur</h2>
-    
+
     <!-- Statistiques -->
     <div class="error-stats">
       <div class="stat-card">
@@ -22,21 +22,21 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Filtres -->
   <div class="error-filters">
     <div class="filter-group">
       <label for="search">Rechercher:</label>
-      <input 
+      <input
         id="search"
-        type="text" 
-        [(ngModel)]="searchTerm" 
+        type="text"
+        [(ngModel)]="searchTerm"
         (input)="onSearchChange()"
         placeholder="URL, méthode, statut..."
         class="filter-input"
       >
     </div>
-    
+
     <div class="filter-group">
       <label for="status">Statut:</label>
       <select id="status" [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
@@ -45,7 +45,7 @@
         <option value="unresolved">Non résolus</option>
       </select>
     </div>
-    
+
     <div class="filter-group">
       <label for="method">Méthode:</label>
       <select id="method" [(ngModel)]="filterMethod" (change)="onFilterChange()" class="filter-select">
@@ -56,7 +56,7 @@
         <option value="DELETE">DELETE</option>
       </select>
     </div>
-    
+
     <div class="filter-actions">
       <button (click)="exportErrors()" class="btn btn-primary" title="Exporter les logs">
         📥 Exporter
@@ -66,7 +66,7 @@
       </button>
     </div>
   </div>
-  
+
   <!-- Tableau des erreurs -->
   <div class="error-table-container">
     <table class="error-table">
@@ -81,8 +81,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr 
-          *ngFor="let error of paginatedLogs" 
+        <tr
+          *ngFor="let error of paginatedLogs"
           [class.selected]="selectedError?.id === error.id"
           (click)="selectError(error)"
           class="error-row"
@@ -101,7 +101,7 @@
           </td>
           <td>{{ getErrorType(error.status) }}</td>
           <td class="error-actions">
-            <button 
+            <button
               (click)="toggleErrorResolved(error.id); $event.stopPropagation()"
               [class]="error.resolved ? 'btn-resolved' : 'btn-unresolved'"
               class="btn-small"
@@ -109,7 +109,7 @@
             >
               {{ error.resolved ? '✅' : '⭕' }}
             </button>
-            <button 
+            <button
               (click)="deleteError(error.id); $event.stopPropagation()"
               class="btn-small btn-delete"
               title="Supprimer"
@@ -120,91 +120,91 @@
         </tr>
       </tbody>
     </table>
-    
+
     <!-- Message si aucune erreur -->
     <div *ngIf="filteredLogs.length === 0" class="no-errors">
       <p>🎉 Aucune erreur trouvée</p>
     </div>
   </div>
-  
+
   <!-- Pagination -->
   <div *ngIf="totalPages > 1" class="pagination">
-    <button 
-      (click)="currentPage = currentPage - 1" 
+    <button
+      (click)="currentPage = currentPage - 1"
       [disabled]="currentPage === 1"
       class="pagination-btn"
     >
       ⬅️ Précédent
     </button>
-    
+
     <span class="pagination-info">
       Page {{ currentPage }} / {{ totalPages }}
     </span>
-    
-    <button 
-      (click)="currentPage = currentPage + 1" 
+
+    <button
+      (click)="currentPage = currentPage + 1"
       [disabled]="currentPage === totalPages"
       class="pagination-btn"
     >
       Suivant ➡️
     </button>
   </div>
-  
+
   <!-- Détails de l'erreur sélectionnée -->
   <div *ngIf="selectedError" class="error-details">
     <div class="error-details-header">
       <h3>🔍 Détails de l'Erreur</h3>
       <button (click)="selectedError = null" class="close-details">✕</button>
     </div>
-    
+
     <div class="error-details-content">
       <div class="detail-section">
         <h4>Informations générales</h4>
         <div class="detail-grid">
           <div class="detail-item">
             <label>ID:</label>
-            <span>{{ selectedError?.id }}</span>
+            <span>{{ selectedError.id }}</span>
           </div>
           <div class="detail-item">
             <label>Timestamp:</label>
-            <span>{{ formatTimestamp(selectedError?.timestamp) }}</span>
+            <span>{{ formatTimestamp(selectedError.timestamp) }}</span>
           </div>
           <div class="detail-item">
             <label>Méthode:</label>
-            <span class="method-badge" [class]="getMethodClass(selectedError?.method)">
-              {{ selectedError?.method }}
+            <span class="method-badge" [class]="getMethodClass(selectedError.method)">
+              {{ selectedError.method }}
             </span>
           </div>
           <div class="detail-item">
             <label>Statut:</label>
-            <span class="status-badge" [class]="getErrorClass(selectedError?.status)">
-              {{ selectedError?.status }} {{ selectedError?.statusText }}
+            <span class="status-badge" [class]="getErrorClass(selectedError.status)">
+              {{ selectedError.status }} {{ selectedError.statusText }}
             </span>
           </div>
         </div>
       </div>
-      
+
       <div class="detail-section">
         <h4>URL</h4>
-        <code class="url-code">{{ selectedError?.url }}</code>
+        <code class="url-code">{{ selectedError.url }}</code>
       </div>
-      
+
       <div class="detail-section" *ngIf="selectedError.error">
         <h4>Détails de l'erreur</h4>
-        <pre class="error-json">{{ selectedError?.error | json }}</pre>
+        <pre class="error-json">{{ selectedError.error | json }}</pre>
       </div>
-      
+
       <div class="detail-section">
         <h4>Statut de résolution</h4>
         <div class="resolution-status">
-          <span [class]="selectedError?.resolved ? 'status-resolved' : 'status-unresolved'">
-            {{ selectedError?.resolved ? '✅ Résolu' : '⭕ Non résolu' }}
+          <span [class]="selectedError.resolved ? 'status-resolved' : 'status-unresolved'">
+            {{ selectedError.resolved ? '✅ Résolu' : '⭕ Non résolu' }}
           </span>
-          <button 
-            (click)="toggleErrorResolved(selectedError?.id)"
+          <button
+            (click)="toggleErrorResolved(selectedError.id)"
             class="btn btn-primary"
           >
-            {{ selectedError?.resolved ? 'Marquer comme non résolu' : 'Marquer comme résolu' }}
+            {{ selectedError.resolved ? 'Marquer comme non résolu' : 'Marquer comme résolu' }}
           </button>
         </div>
       </div>

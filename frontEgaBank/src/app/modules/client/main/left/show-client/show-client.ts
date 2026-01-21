@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Client, ClientStatus } from '../../../../../core/models/client';
 import { UpdateClientDto } from '../../../../../core/models/client-dto';
 import { ClientService } from '../../../../../core/services/client.service';
@@ -8,7 +9,7 @@ import { NotificationService } from '../../../../../core/services/notification.s
 import { DialogService } from '../../../../../core/services/dialog.service';
 import { Subscription, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { Compte } from '../../../../../core/models/comptes';
+import { Compte, CreateCompteDto } from '../../../../../core/models/comptes';
 
 // Import components
 import { DialogComponent } from '../../../../../shared/components/dialog/dialog.component';
@@ -21,6 +22,7 @@ import { ClientAccountsComponent } from '../../../../../shared/components/client
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     DialogComponent,
     ClientDetailComponent,
     ClientEditComponent,
@@ -40,19 +42,32 @@ export class ShowClient implements OnInit, OnDestroy {
   showClientEdit = false;
   showClientAccounts = false;
   showStatusDialog = false;
+  showCreateAccountModal = false;
 
   // Current data
   selectedClient: Client | null = null;
   selectedClientAccounts: Compte[] = [];
   dialogConfig: any = null;
 
+  // Create account form
+  createCompteForm: FormGroup;
+
   constructor(
+    private fb: FormBuilder,
     private clientService: ClientService,
     private compteService: CompteService,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
     private dialogService: DialogService
-  ) {}
+  ) {
+    this.createCompteForm = this.fb.group({
+      typeCompte: ['1', Validators.required],
+      balanceInitial: [0, [Validators.required, Validators.min(0)]],
+      devis: [{value: 'XOF', disabled: true}],
+      decouvert: [0],
+      tauxInteret: [0]
+    });
+  }
 
   ngOnInit(): void {
     this.onGetClients();
@@ -402,11 +417,68 @@ export class ShowClient implements OnInit, OnDestroy {
   }
 
   onCreateAccountFromAccounts(client: Client): void {
-    // TODO: Implémenter la création de compte
-    this.dialogService.showInfo(
-      'Création de compte',
-      'La fonctionnalité de création de compte sera bientôt disponible.'
-    );
+    this.selectedClient = client;
+    this.showCreateAccountModal = true;
+    this.createCompteForm.reset({
+      typeCompte: '1',
+      balanceInitial: 0,
+      devis: 'XOF',
+      decouvert: 0,
+      tauxInteret: 0
+    });
+    this.cdr.detectChanges();
+  }
+
+  createCompte(): void {
+    if (this.createCompteForm.invalid || !this.selectedClient) return;
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    const formValue = this.createCompteForm.getRawValue();
+    const createCompteDto: CreateCompteDto = {
+      typeCompte: parseInt(formValue.typeCompte),
+      balanceInitial: formValue.balanceInitial,
+      devis: formValue.devis,
+      decouvert: formValue.typeCompte === '1' ? formValue.decouvert : undefined,
+      tauxInteret: formValue.typeCompte === '2' ? formValue.tauxInteret : undefined
+    };
+
+    // Store clientId before it becomes null
+    const clientId = this.selectedClient.id;
+    const clientName = `${this.selectedClient.nom} ${this.selectedClient.prenom}`;
+
+    this.compteService.createCompteForClient(clientId, createCompteDto).subscribe({
+      next: (compte) => {
+        this.notificationService.notifyOperationSuccess(`Compte ${compte.numCompte} créé avec succès pour ${clientName}`);
+        this.closeCreateAccountModal();
+        this.loadClientAccounts(clientId);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Erreur lors de la création du compte:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        this.notificationService.sendNotification({
+          type: 'compte',
+          action: 'create',
+          message: err.error?.message || 'Erreur lors de la création du compte'
+        });
+      }
+    });
+  }
+
+  closeCreateAccountModal(): void {
+    this.showCreateAccountModal = false;
+    this.selectedClient = null;
+    this.createCompteForm.reset({
+      typeCompte: '1',
+      balanceInitial: 0,
+      devis: 'XOF',
+      decouvert: 0,
+      tauxInteret: 0
+    });
   }
 
   onAccountDeleted(): void {

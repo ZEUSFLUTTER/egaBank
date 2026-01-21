@@ -78,17 +78,30 @@ export class Virement implements OnInit, OnDestroy {
       next: () => {
         this.isError = '';
         this.isSuccessed = true;
+
+        const montant = this.fb.montant.value;
+        const compteSrc = this.fb.numCompteS.value;
+        const compteDest = this.fb.numCompteD.value;
+        const ancienSoldeSrc = this.compteSource?.balance || 0;
+        const nouveauSoldeSrc = ancienSoldeSrc - montant;
+
         this.opForm.reset();
         this.submitted = false;
         this.showSourceDetails = false;
         this.showDestDetails = false;
 
-        // 🔄 NOTIFICATION EN TEMPS RÉEL
-        this.notificationService.notifyOperationSuccess('Virement effectué avec succès', {
+        // 🔄 NOTIFICATION EN TEMPS RÉEL avec détails
+        this.notificationService.notifyOperationSuccess('✓ Virement effectué avec succès', {
           ...operationData,
+          montantTransfere: montant,
+          compteSource: compteSrc,
+          compteDestination: compteDest,
+          ancienSoldeSource: ancienSoldeSrc,
+          nouveauSoldeSource: nouveauSoldeSrc,
           type: 'VIREMENT',
-          compteSource: this.compteSource,
-          compteDest: this.compteDest
+          sourceDetails: this.compteSource,
+          destDetails: this.compteDest,
+          message: `Virement de ${montant} FCFA du compte ${compteSrc} vers ${compteDest} réussi. Solde du compte source: ${ancienSoldeSrc} → ${nouveauSoldeSrc} FCFA`
         });
 
         // Forcer le rafraîchissement des composants liés
@@ -101,9 +114,30 @@ export class Virement implements OnInit, OnDestroy {
         }, 3000);
       },
       error: (err: any) => {
+        const montant = this.fb.montant.value;
+        const compteSrc = this.fb.numCompteS.value;
+        const compteDest = this.fb.numCompteD.value;
+
+        let errorMessage = err.error?.message || "Erreur lors du virement";
+
+        // Améliorer le message d'erreur selon le type
+        if (err.status === 404) {
+          errorMessage = `Erreur: Un des comptes (${compteSrc} ou ${compteDest}) est introuvable.`;
+        } else if (err.status === 400) {
+          errorMessage = `Erreur: Montant invalide ou solde insuffisant (${montant} FCFA demandé).`;
+        } else if (err.status === 409) {
+          errorMessage = errorMessage || `Erreur: Un des comptes est suspendu ou désactivé.`;
+        }
+
         console.error('Erreur virement:', err);
-        this.isError = err.error?.message || err.message || "Erreur lors du virement";
+        this.isError = errorMessage;
         this.isSuccessed = false;
+
+        this.notificationService.sendNotification({
+          type: 'operation',
+          action: 'error',
+          message: `✗ Virement échoué: ${errorMessage}`
+        });
       }
     });
   }

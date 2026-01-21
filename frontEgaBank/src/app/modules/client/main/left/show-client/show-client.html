@@ -90,10 +90,10 @@
                   </svg>
                   {{c.sexe === 'M' ? 'M' : 'F'}}
                 </span>
-                
-                <span [ngSwitch]="c.status" 
-                      [class]="'inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border' + 
-                      (c.status === 'ACTIVE' ? ' bg-emerald-100 text-emerald-800 border-emerald-200' : 
+
+                <span [ngSwitch]="c.status"
+                      [class]="'inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border' +
+                      (c.status === 'ACTIVE' ? ' bg-emerald-100 text-emerald-800 border-emerald-200' :
                        c.status === 'PENDING' ? ' bg-yellow-100 text-yellow-800 border-yellow-200' :
                        c.status === 'SUSPENDED' ? ' bg-orange-100 text-orange-800 border-orange-200' :
                        c.status === 'BLOCKED' ? ' bg-red-100 text-red-800 border-red-200' :
@@ -107,7 +107,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-center">
               <div class="flex items-center justify-center space-x-2">
                 <!-- Voir -->
-                <button (click)="viewClient(c)" 
+                <button (click)="viewClient(c)"
                         class="inline-flex items-center p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                         title="Voir le client">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +117,7 @@
                 </button>
 
                 <!-- Modifier -->
-                <button (click)="updateClient(c)" 
+                <button (click)="updateClient(c)"
                         class="inline-flex items-center p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors"
                         title="Modifier le client">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@
                 </button>
 
                 <!-- Changer statut -->
-                <button (click)="changeStatus(c)" 
+                <button (click)="changeStatus(c)"
                         class="inline-flex items-center p-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors"
                         title="Changer le statut">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@
                 </button>
 
                 <!-- Comptes -->
-                <button (click)="viewAccounts(c)" 
+                <button (click)="viewAccounts(c)"
                         class="inline-flex items-center p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
                         title="Voir les comptes">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@
                 </button>
 
                 <!-- Supprimer -->
-                <button (click)="deleteClient(c)" 
+                <button (click)="deleteClient(c)"
                         class="inline-flex items-center p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                         title="Supprimer le client">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@
 </div>
 
 <!-- Modals -->
-<app-dialog 
+<app-dialog
   *ngIf="dialogConfig"
   [config]="dialogConfig"
   (close)="onDialogClose($event)">
@@ -259,3 +259,49 @@
   (createAccount)="onCreateAccountFromAccounts($event)"
   (accountDeleted)="onAccountDeleted()">
 </app-client-accounts>
+<!-- Modal Créer un compte -->
+<div *ngIf="showCreateAccountModal && selectedClient" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+    <h3 class="text-xl font-bold text-gray-900 mb-4">Créer un nouveau compte</h3>
+    <p class="text-sm text-gray-600 mb-6">Pour : <span class="font-semibold">{{ selectedClient.nom }} {{ selectedClient.prenom }}</span></p>
+
+    <form [formGroup]="createCompteForm" (ngSubmit)="createCompte()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Type de compte</label>
+        <select formControlName="typeCompte" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          <option value="1">Compte Courant</option>
+          <option value="2">Compte Épargne</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Solde initial (FCFA)</label>
+        <input type="number" formControlName="balanceInitial" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" min="0">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Devise</label>
+        <input type="text" formControlName="devis" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+      </div>
+
+      <div *ngIf="createCompteForm.get('typeCompte')?.value === '1'">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Découvert autorisé (FCFA)</label>
+        <input type="number" formControlName="decouvert" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" min="0">
+      </div>
+
+      <div *ngIf="createCompteForm.get('typeCompte')?.value === '2'">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Taux d'intérêt annuel (%)</label>
+        <input type="number" formControlName="tauxInteret" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" min="0" step="0.01">
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button type="button" (click)="closeCreateAccountModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+          Annuler
+        </button>
+        <button type="submit" [disabled]="createCompteForm.invalid || isLoading" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50">
+          {{ isLoading ? 'Création en cours...' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
